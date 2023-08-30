@@ -57,3 +57,4 @@ class User(AbstractUser):
 
 class AddressUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    address = models.TextField(verbose_name='Адрес доставки')

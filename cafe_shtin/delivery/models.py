@@ -61,7 +61,7 @@ class AdditiveToDish(models.Model):
                                  on_delete=models.PROTECT,
                                  verbose_name='Дополнение',
                                  )
-    dish = models.ForeignKey(Dishes,
+    dish = models.ForeignKey(Product,
                              on_delete=models.CASCADE,
                              verbose_name='Блюдо в которое входит дополнение',
                              )
@@ -80,7 +80,7 @@ class Orders(models.Model):
 
     numbers_order = models.IntegerField(verbose_name='Номер заказа')
     date_order = models.DateTimeField(verbose_name="Время заказа", auto_now_add=True)
-    user = models.ForeignKey('User', on_delete=models.CASCADE, verbose_name='Покупатель')
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name='Покупатель')
     is_paid = models.BooleanField(verbose_name='Заказ оплачен?', default=False)
     payment_type_choice = [
         ('site', 'На сайте'),
@@ -103,7 +103,7 @@ class Orders(models.Model):
 
 class ItemsOrder(models.Model):
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, verbose_name='Заказ')
-    dish = models.ForeignKey(Dishes, on_delete=models.CASCADE, verbose_name='Блюдо')
+    dish = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Блюдо')
     count = models.IntegerField(verbose_name='Количество')
 
     def __str__(self):

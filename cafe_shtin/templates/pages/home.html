@@ -1,1 +1,33 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/delivery/home.css' %}">
+  <link rel="stylesheet" href="{% static 'css/delivery/dish_detail.css' %}">
+  <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+{% endblock css %}
+
+{% block javascript %}
+
+  <script defer src="{% static 'js/delivery/classie.js' %}"></script>
+  <script defer src="{% static 'js/delivery/modalEffects.js' %}"></script>
+{% endblock javascript %}
+
+
+{% block content %}
+  <div class="container" style="position: relative; padding-top: 77px;">
+    <div class="owl-carousel owl-theme" id="carousel-promo">
+      <div class="item">
+        <img src="{% static 'images/carousels/slide-central.png' %}" alt="...">
+      </div>
+      <div class="item">
+        <img src="{% static 'images/carousels/slide-left.png' %}" alt="...">
+      </div>
+      <div class="item">
+        <img src="{% static 'images/carousels/slide-right.png' %}" alt="...">
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}

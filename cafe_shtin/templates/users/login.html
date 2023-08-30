@@ -1,10 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+{% load static %}
+<div class="modal modal-login">
+    <div class="login__block">
+        <p>
+            <a href="#close-modal" rel="modal:close" class="close-modal">
+                <img src="{% static 'images/modal_login/close.svg' %}" alt="x" class="login__close">
+            </a>
+        </p>
+        {% block input_info %}
+        <form action="#" class="form" method="post" id="form_login">
+            <h2 class="form__title">Авторизация</h2>
+            {% for field in user_form %}
+            <div class="fieldWrapper">
+                <font color="#ff8c00">{{ field.errors | escape}}</font>
+            </div>
+            {% endfor %}
+            <input required class="input form__input phone-user" type="tel" placeholder="Введите номер телефона" name="phone_number">
+            <input type="hidden" name="next_page" value="" id="next_page"> {% csrf_token %}
+            <input required class="form__input form__btn button button--primary" type="submit" value="Войти" id="send_form_login">
+        </form>
+        {% endblock input_info %}
+    </div>
+</div>

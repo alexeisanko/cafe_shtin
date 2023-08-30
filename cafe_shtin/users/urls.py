@@ -1,14 +1,13 @@
 from django.urls import path
 
 from cafe_shtin.users.views import (
-    user_detail_view,
-    user_redirect_view,
-    user_update_view,
+    profile_user_view,
+    user_login_view
+
 )
 
 app_name = "users"
 urlpatterns = [
-    path("~redirect/", view=user_redirect_view, name="redirect"),
-    path("~update/", view=user_update_view, name="update"),
-    path("<str:username>/", view=user_detail_view, name="detail"),
+    path("profile/", view=profile_user_view, name="profile"),
+    path("login/", view=user_login_view, name="login"),
 ]

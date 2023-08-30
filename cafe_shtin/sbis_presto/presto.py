@@ -1,14 +1,15 @@
+import json
+import logging
+import time
+from typing import Optional
+from datetime import datetime, date
 
+import requests
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-# from shop import models as shop_models
-# from shop.services.crud import get_shop_id
-from datetime import datetime
-import logging
-import time
-import requests
-import json
+
+from cafe_shtin.delivery.models import Product, Category
 
 logger = logging.getLogger(__name__)
 
@@ -53,25 +54,25 @@ class SbisPresto:
         logger.debug('Фото блюд сохранены успешно')
         logger.debug('Актуализация категорий')
         for category in categories:
-            obj, created = shop_models.Category.objects.update_or_create(id=category['id'],
-                                                                         defaults={'name': category['name']})
+            obj, created = Category.objects.update_or_create(id=category['id'],
+                                                             defaults={'name': category['name']})
         logger.debug('Актуализация блюд')
         for dish in dishes:
             try:
-                obj, created = shop_models.Dishes.objects.update_or_create(id=dish['id'],
-                                                                           defaults={
-                                                                               'name': dish['name'],
-                                                                               'category_id': shop_models.Category.objects.get(
-                                                                                   id=dish['category_id']),
-                                                                               'price': dish['cost'],
-                                                                               'description': dish['description'],
-                                                                               'image': dish['image_url'],
-                                                                               'weight': dish['attributes'][
-                                                                                   'outQuantity'],
-                                                                               'uuid': dish['uuid'],
-                                                                               'price_list_id': dish['price_list_id']
-                                                                           }
-                                                                           )
+                obj, created = Product.objects.update_or_create(id=dish['id'],
+                                                                defaults={
+                                                                    'name': dish['name'],
+                                                                    'category_id': Category.objects.get(
+                                                                        id=dish['category_id']),
+                                                                    'price': dish['cost'],
+                                                                    'description': dish['description'],
+                                                                    'image': dish['image_url'],
+                                                                    'weight': dish['attributes'][
+                                                                        'outQuantity'],
+                                                                    'uuid': dish['uuid'],
+                                                                    'price_list_id': dish['price_list_id']
+                                                                }
+                                                                )
             except ObjectDoesNotExist:
                 logger.warning(f'Неудачная попытка добавить блюдо {dish["name"]}\n.'
                                f'Невозможно добавить блюдо с категорией id={dish["category_id"]}\n'
@@ -126,7 +127,7 @@ class SbisPresto:
         return dishes
 
     def update_count_dishes_in_shop(self):
-        shop_models.CountProductsInShop.objects.all().update(available=False)
+        Product.objects.all().update(available=False)
         for shop in self.shops:
             categories, dishes = self._get_list_dishes(shop_id=shop['id'],
                                                        menu_id=self.menu['id'],
@@ -134,9 +135,8 @@ class SbisPresto:
                                                        balance='true')
             for dish in dishes:
                 try:
-                    obj, created = shop_models.CountProductsInShop.objects.update_or_create(
-                        shop_id=shop_models.Shops.objects.get(id=shop['id']),
-                        dish_id=shop_models.Dishes.objects.get(id=dish['id']),
+                    obj, created = Product.objects.update_or_create(
+                        dish_id=Product.objects.get(id=dish['id']),
                         defaults={
                             'count': dish['balance'],
                             'available': True})
@@ -146,10 +146,6 @@ class SbisPresto:
                                    f'Возможно еще не прошла актуализация каталога блюд на сайте')
                 else:
                     logger.info(f'Количество блюд для id = {dish["id"]} обновлено')
-
-    def delete_dishes_in_shop(self):
-        for shop in self.shops:
-            _ = shop_models.CountProductsInShop.objects.filter(shop_id=shop['id']).delete()
 
 
 class SbisOrder:
@@ -177,7 +173,7 @@ class SbisOrder:
             "datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),  # Время на которое создается заказ. Обязательно
             "nomenclatures": self.nomenclatures,
             "delivery": {
-                "addressFull": "г. Киров, ул. Советская, д. 166", # Обязательно при доставкеself.address,
+                "addressFull": "г. Киров, ул. Советская, д. 166",  # Обязательно при доставкеself.address,
                 'addressJSON': '{"City": "г. Киров", "Street": "ул. Советская", "HouseNum": "д. 166", "Entrance": "3", "Floor": "87", "AptNum": "47", "Address": "г. Киров, ул. Советская, д. 166, кв. 87"}',
                 # Попробывать без него
                 "paymentType": self.payment,  # Обязательно, варианты: «card», «online», «cash»
@@ -196,7 +192,7 @@ class SbisOrder:
         pass
 
 
-class SbisCRM:
+class SbisUser:
     def __init__(self):
         self.headers = {
             "Host": "online.sbis.ru",
@@ -233,25 +229,7 @@ class SbisCRM:
         response = requests.post(url, headers=self.headers, data=json.dumps(payload)).json()
         return response
 
-    def _make_new__user(self, phone: str):
-        params = {
-            "CustomerData": {
-                "d": {
-                    'ContactData': {'d': [[phone, 'mobile_phone']],
-                                    's': [{'n': 'Value', 't': 'Строка'},
-                                          {'n': 'Type', 't': 'Строка'}]},
-                    'Name': 'Без имени',
-                },
-                "s": {
-                    'ContactData': 'Выборка',
-                    'Name': 'Строка',
-                },
-            },
-        }
-        self.__invoke("CRMClients.SaveCustomer", params, self.sid)
-        return self._check_user(phone)
-
-    def _check_user(self, phone: str) -> dict:
+    def get_user_crm(self, phone: str) -> dict:
         params = {
             "client_data": {
                 "d": {
@@ -266,19 +244,145 @@ class SbisCRM:
             },
             "options": None
         }
-        get_user = self.__invoke("CRMClients"
+        user_crm = self.__invoke("CRMClients"
                                  ".GetCustomerByParams", params, self.sid)['result']['d']
-        if get_user:
-            return {'check': True,
-                    'birthday': get_user['BirthDay'],
+        if user_crm:
+            return {
+                    "is_user":  True,
+                    'birthday': user_crm['BirthDay'],
                     'phone': phone,
-                    'uuid': get_user['UUID'],
-                    'name': get_user['FirstName']}
-        return {'check': False}
+                    'uuid': user_crm['UUID'],
+                    'name': user_crm['FirstName'],
+                }
+        return {
+                    "is_user":  False,
+                    'phone': phone,
+                }
 
-    def get_data_user_crm(self, phone: str) -> dict:
-        user = self._check_user(phone)
-        if user['check']:
-            return user
-        user = self._make_new__user(phone)
-        return user
+
+class CardUser:
+    def __init__(self, phone: str, name: Optional[str] = None, birthday: Optional[date] = None,
+                 gender: Optional[int] = None):
+        self.phone = phone
+        self.name = name
+        self.birthday = birthday
+        self.gender = gender
+        self.headers = {'Content-Type': 'application/json',
+                        'Cookie': 'CpsUserId=034d5129-2037-4ddb-8af8-63b894d90a5a; s3csu=daab; s3su=00a28c6f-00a2a4ae; s3tok-daab=; sid=00a28c6f-00a2a4ae-000d-1111111111111111'
+                        }
+        self.card_type_uuid = "16f7b6d9-7908-443e-82f8-d22e45c31508"
+
+    def verify_phone(self) -> dict:
+        url = "https://sabyget.ru/discount-cards/service/?x_version=23.5104-16"
+        payload = json.dumps({
+            "jsonrpc": "2.0",
+            "protocol": 6,
+            "method": "Questionary.VerifyPhone",
+            "params": {
+                "CardTypeUUID": self.card_type_uuid,
+                "PhoneNumber": self.phone
+            },
+            "id": 1
+        })
+
+        response = requests.request("POST", url, headers=self.headers, data=payload).json()
+        uniq_id = response['result']
+        return uniq_id
+
+    def get_or_create_user(self, uniq_id: str, code_user: int) -> dict:
+        url = "https://sabyget.ru/discount-cards/service/?x_version=23.2155-19"
+        payload = json.dumps({
+            "jsonrpc": "2.0",
+            "protocol": 6,
+            "method": "Questionary.CreateCard",
+            "params": {
+                "CardTypeUUID": self.card_type_uuid,
+                "Data": {
+                    "d": [
+                        "44507f6a-b617-4c5a-a0c4-0ed4a4ad1e58",
+                        self.phone,
+                        uniq_id,
+                        code_user,
+                        {
+                            "d": [
+                                self.name,
+                                None,
+                                None,
+                                None
+                            ],
+                            "s": [
+                                {
+                                    "t": "Строка",
+                                    "n": "FIO"
+                                },
+                                {
+                                    "t": "Строка",
+                                    "n": "Email"
+                                },
+                                {
+                                    "t": "Дата",
+                                    "n": "BirthDay"
+                                },
+                                {
+                                    "t": "Число целое",
+                                    "n": "Gender"
+                                }
+                            ],
+                            "_type": "record",
+                            "f": 1
+                        },
+                        True,
+                        True,
+                        "discount-cards.gpay.channel:6990a57a-7459-4db2-b575-0553a0e7dc31",
+                        "discount-cards.card-image.channel.d50c3c9d-1c15-4de3-85c8-552137e4f617:10658990",
+                        None
+                    ],
+                    "s": [
+                        {
+                            "t": "UUID",
+                            "n": "CardTypeUUID"
+                        },
+                        {
+                            "t": "Строка",
+                            "n": "PhoneNumber"
+                        },
+                        {
+                            "t": "Строка",
+                            "n": "SMSTicket"
+                        },
+                        {
+                            "t": "Строка",
+                            "n": "SMSCode"
+                        },
+                        {
+                            "t": "Запись",
+                            "n": "ClientData"
+                        },
+                        {
+                            "t": "Логическое",
+                            "n": "WithWalletQR"
+                        },
+                        {
+                            "t": "Логическое",
+                            "n": "WithGPayQR"
+                        },
+                        {
+                            "t": "Строка",
+                            "n": "EventChannelGPay"
+                        },
+                        {
+                            "t": "Строка",
+                            "n": "EventChannelCardImage"
+                        },
+                        {
+                            "t": "Число целое",
+                            "n": "PreferredPass"
+                        }
+                    ],
+                    "_type": "record",
+                    "f": 0
+                }
+            },
+            "id": 1
+        })
+        response = requests.post(url, data=payload, headers=self.headers)

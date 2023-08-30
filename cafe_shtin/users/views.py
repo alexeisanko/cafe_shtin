@@ -1,48 +1,62 @@
+from typing import Any
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.messages.views import SuccessMessageMixin
-from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, RedirectView, UpdateView
+from django.contrib.auth.views import LoginView
+from django.contrib.auth import login, authenticate
+from django.views.generic import DetailView
+from django.http import JsonResponse, HttpRequest
+from rest_framework.response import Response
+from rest_framework import status
+
+from cafe_shtin.users.api.serializers import LoginSerializer
+from cafe_shtin.sbis_presto.presto import CardUser
 
 User = get_user_model()
 
 
-class UserDetailView(LoginRequiredMixin, DetailView):
-
+class ProfileUserView(LoginRequiredMixin, DetailView):
+    template_name = "users/profile.html"
     model = User
     slug_field = "username"
     slug_url_kwarg = "username"
 
 
-user_detail_view = UserDetailView.as_view()
+profile_user_view = ProfileUserView.as_view()
 
 
-class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class UserLoginView(LoginView):
+    template_name = "users/login.html"
 
-    model = User
-    fields = ["name"]
-    success_message = _("Information successfully updated")
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> Response:
+        serializer = LoginSerializer(data=request.POST)
+        if serializer.is_valid():
+            data = serializer.data
+            if data['method'] == 'verify_phone':
+                uniq_id = self._get_uniq_code(phone=data['phone'],
+                                              name=data['name'],
+                                              birthday=data['birthday'])
+                serializer.uniq_id = uniq_id
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if data['method'] == 'confirm_phone':
+                is_user = self._confirm_phone(phone=data['phone'],
+                                              name=data['name'],
+                                              birthday=data['birthday'],
+                                              uniq_id=data['birthday'],
+                                              code=data['birthday'])
+                if is_user:
+                    user = login(request)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get_success_url(self):
-        assert (
-            self.request.user.is_authenticated
-        )  # for mypy to know that the user is authenticated
-        return self.request.user.get_absolute_url()
+    def _get_uniq_code(self, phone, name, birthday):
+        user = CardUser(phone=phone, name=name, birthday=birthday)
+        uniq_id = user.verify_phone()
+        return uniq_id
 
-    def get_object(self):
-        return self.request.user
-
-
-user_update_view = UserUpdateView.as_view()
+    def _confirm_phone(self, phone, name, birthday, uniq_id, code):
+        user = CardUser(phone=phone, name=name, birthday=birthday)
+        get_or_create_user = user.get_or_create_user(uniq_id=uniq_id, code_user=code)
+        return get_or_create_user
 
 
-class UserRedirectView(LoginRequiredMixin, RedirectView):
-
-    permanent = False
-
-    def get_redirect_url(self):
-        return reverse("users:detail", kwargs={"username": self.request.user.username})
-
-
-user_redirect_view = UserRedirectView.as_view()
+user_login_view = UserLoginView.as_view()

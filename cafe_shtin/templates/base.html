@@ -4,77 +4,114 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title>{% block title %}Буфетерия{% endblock title %}</title>
+  <title>{% block title %}ШТИН{% endblock title %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Site delivery for my dear friend">
   <meta name="author" content="Alexei Sanko">
 
   <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap"
+    rel="stylesheet">
 
   <!-- CSS
   ================================================== -->
-  <link href="{% static 'css/base.css' %}" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/login.css' %}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css">
+  <link href="{% static 'css/base.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/users/login.css' %}">
   {% block css %}{% endblock %}
 
   <!-- Javascript
   ================================================== -->
-   <script defer src="{% static 'js/base.js' %}"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js"></script>
+  <script defer src="{% static 'js/owl.carousel.min.js' %}"></script>
+  <script defer src="{% static 'js/carousel.js' %}"></script>
+  <script defer src="{% static 'js/base.js' %}"></script>
+  <script src="{% static 'js/users/login.js' %}"></script>
   {% block javascript %}{% endblock javascript %}
 </head>
 
 <body>
-<div class="mb-1">
-  <nav class="navbar navbar-expand-md navbar-light bg-light">
-    <div class="container-fluid">
-      <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse"
-              data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-              aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <a class="navbar-brand" href="{% url 'home' %}">Cafe Shtin</a>
-
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="{% url 'home' %}">Home <span class="visually-hidden">(current)</span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'about' %}">About</a>
-          </li>
-          {% if request.user.is_authenticated %}
-            <li class="nav-item">
-              {# URL provided by django-allauth/account/urls.py #}
-              <a class="nav-link" href="{% url 'users:detail' request.user.username %}">{% translate "My Profile" %}</a>
-            </li>
-            <li class="nav-item">
-              {# URL provided by django-allauth/account/urls.py #}
-              <a class="nav-link" href="{% url 'account_logout' %}">{% translate "Sign Out" %}</a>
-            </li>
+<header class="header">
+  <div class="container">
+    <div class="menu">
+      <div class="contacts menu__contacts">
+        <a href="{% url 'delivery:home' %}" class="img contacts__img link"><img
+          src={% static '/images/menu/logo.png' %} alt="logo"></a>
+        <div class="contacts__info info">
+          <a href="tel:89992552525" class="info__phone link">8 999 255 25 25</a>
+          <a href="mailto:example@example.com" class="info__mail link">example@example.com</a>
+        </div>
+      </div>
+      <div class="right">
+        <div class="nav">
+          <!-- <a href="{% url 'delivery:home' %}" class="nav__item link">Главная</a> -->
+          <a href="{% url 'delivery:home' %}#menu" class="nav__item link">Меню</a>
+          <!-- <a href="{% url 'delivery:about' %}" class="nav__item link">О нас</a> -->
+          <!-- <a href="#" class="nav__item link">Спецпредложения</a> -->
+        </div>
+        <div class="icons">
+          {% if user.is_authenticated %}
+            <a href="{% url 'users:profile' %}">
           {% else %}
-            {% if ACCOUNT_ALLOW_REGISTRATION %}
-              <li class="nav-item">
-                {# URL provided by django-allauth/account/urls.py #}
-                <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
-              </li>
-            {% endif %}
-            <li class="nav-item">
-              {# URL provided by django-allauth/account/urls.py #}
-              <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
-            </li>
+            <a href="{% url 'users:login' %}" class="user_login" next_page="{% url 'users:profile' %}">
           {% endif %}
-        </ul>
+          <svg class="icon icons__auth">
+            <use xlink:href="/../static/images/menu/sprite.svg#auth">
+            </use>
+          </svg></a> {% if user.is_superuser %}
+          <a href="/admin" class="nav__item link">
+            <div class="basket">
+              <span class="basket__price">Админ</span>
+            </div>
+          </a>
+        {% else %}
+          <a href="{% url 'delivery:basket' %}" class="link">
+            <div class="basket">
+              <svg class="icon icons__basket">
+                <use xlink:href="/../static/images/menu/sprite.svg#basket"></use>
+              </svg>
+              {% if cart.get_total_count_dishes %}
+                <span class="basket__media" style="display: flex">{{ cart.get_total_count_dishes }}</span>
+              {% else %}
+                <span class="basket__media">{{ cart.get_total_count_dishes }}</span>
+              {% endif %}
+              <span class="basket__price">{{ cart.get_total_price }} ₽</span>
+            </div>
+          </a>
+        {% endif %}
+        </div>
       </div>
     </div>
-  </nav>
+  </div>
+</header>
 
-</div>
+{% block content %}{% endblock content %}
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__info">
+      <div class="footer__phone">
+        <a href="tel:89999999999" class="footer__number">8 (999) 999 99 99</a>
+        <img src="{% static 'images/contacts/phone.svg' %}" alt="phone">
+      </div>
+      <div class="footer__social">
+        <a href="#"><img src="{% static 'images/contacts/vk.svg' %}" alt="vk"></a>
+        <a href="#"><img src="{% static 'images/contacts/mail.svg' %}" alt="insta"></a>
+        <a href="#"><img src="{% static 'images/contacts/telegram.svg' %}" alt="facebook"></a>
+      </div>
+      <div class="footer__mail">
+        <img src="{% static 'images/contacts/mail.svg' %}" alt="mail">
+        <a href="mailto:example@example.com" class="footer__mail">example@example.com</a>
+      </div>
+    </div>
+  </div>
+</footer>
 
 <div class="container">
-
   {% if messages %}
     {% for message in messages %}
       <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %}">
@@ -83,9 +120,6 @@
       </div>
     {% endfor %}
   {% endif %}
-
-  {% block content %}{% endblock content %}
-
 </div> <!-- /container -->
 
 {% block modal %}{% endblock modal %}

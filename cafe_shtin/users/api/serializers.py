@@ -1,14 +1,18 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-User = get_user_model()
+
+class CheckUserSerializer(serializers.Serializer):
+    is_user = serializers.BooleanField(read_only=True, default=False)
+    phone = serializers.CharField(read_only=True)
+    name = serializers.CharField(read_only=True, required=False)
+    birthday = serializers.DateField(read_only=True, required=False)
 
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["username", "name", "url"]
-
-        extra_kwargs = {
-            "url": {"view_name": "api:user-detail", "lookup_field": "username"}
-        }
+class LoginSerializer(serializers.Serializer):
+    method = serializers.CharField()
+    is_user = serializers.BooleanField()
+    phone = serializers.CharField()
+    name = serializers.CharField()
+    birthday = serializers.DateField()
+    uniq_id = serializers.CharField(required=False)
+    code_user = serializers.IntegerField(min_value=1000, max_value=9999, required=False)

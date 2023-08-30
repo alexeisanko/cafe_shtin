@@ -1,0 +1,269 @@
+﻿/* Свойства модального окна */
+
+.md-perspective,
+.md-perspective body {
+    height: 100%;
+    overflow: hidden;
+}
+
+.md-perspective body {
+    background: #222;
+    -webkit-perspective: 600px;
+    -moz-perspective: 600px;
+    perspective: 600px;
+}
+
+.md-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    height: auto;
+    z-index: 2000;
+    visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -ms-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    width: 490px;
+    margin: auto;
+    padding: 20px;
+}
+
+.md-show {
+    visibility: visible;
+}
+
+.md-overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    visibility: hidden;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    opacity: 0;
+    background: rgba(173, 173, 173, 0.8);
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+.md-show~.md-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+/* Content styles */
+
+.md-content {
+    color: #000;
+    background: #fff;
+    position: relative;
+    margin: 0 auto;
+    width: auto;
+    border: 1px solid #F8AB06;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+
+/* Эффект появления */
+
+.md-effect .md-content {
+    -webkit-transform: scale(0.7);
+    -moz-transform: scale(0.7);
+    -ms-transform: scale(0.7);
+    transform: scale(0.7);
+    opacity: 0;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+.md-show.md-effect .md-content {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+    opacity: 1;
+}
+
+
+/* свойства для кнопки "Закрыть" */
+
+.close {
+    float: right;
+    font-family: sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+    text-decoration: none;
+}
+
+
+/* свойства для кнопки "Закрыть" при нахождении её в фокусе или наведении */
+
+.close:focus,
+.close:hover {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+    opacity: .75;
+}
+
+
+/* свойства для блока, содержащего основное содержимое окна */
+
+.modal-body {
+    position: relative;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 5px;
+    padding-right: 5px;
+    overflow: auto;
+}
+
+.modal__img {
+    margin: auto auto 20px;
+    text-align: center;
+}
+
+.modal__title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.modal__name,
+.modal__cost {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 34px;
+    letter-spacing: 0em;
+    max-width: 220px;
+}
+
+.modal__text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 31px;
+    letter-spacing: 0em;
+    opacity: 0.8;
+    margin-bottom: 20px;
+}
+
+.modal__add,
+.modal__count {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.count__minus img {
+    padding: 13px 8px;
+    background-color: #F8AB06;
+    border: 1px solid #F8AB06;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.count__plus img {
+    padding: 8px;
+    background-color: #F8AB06;
+    border: 1px solid #F8AB06;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.count__text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: 0em;
+    margin: 0px 15px;
+}
+
+.count__btn {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 17px;
+    letter-spacing: 0em;
+    text-transform: uppercase;
+    color: #fff;
+    background-color: #F8AB06;
+    border: 1px solid #F8AB06;
+    border-radius: 6px;
+    padding: 12px 30px;
+    transition: background-color 0.8s, color 0.8s;
+}
+
+.count__btn:hover {
+    cursor: pointer;
+    background-color: #fff;
+    color: #F8AB06;
+}
+
+@media screen and (max-width: 500px) {
+    .md-modal {
+        width: 350px;
+        padding: 5px;
+    }
+    .close {
+        position: absolute;
+        right: 20px;
+        z-index: 100;
+    }
+    .modal__img {
+        margin: auto;
+    }
+    .modal__img img {
+        width: 270px;
+        height: 270px;
+    }
+    .modal__name,
+    .modal__cost {
+        font-size: 16px;
+        line-height: 16px;
+        max-width: 170px;
+    }
+    .modal__text {
+        line-height: 24px;
+    }
+    .modal__add,
+    .modal__count {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .modal__count {
+        margin-bottom: 10px;
+    }
+}
+
+@media screen and (max-width: 350px) {
+    .md-modal {
+        width: 300px;
+    }
+    .modal__img img {
+        width: 230px;
+        height: 230px;
+    }
+    .count__btn {
+        font-size: 12px;
+    }
+}
