@@ -2,29 +2,22 @@ from datetime import datetime
 from cafe_shtin.delivery.models import Category, Product
 
 
-def get_actual_menu(min_count=0) -> tuple:
-    breakfast = {}
+def get_actual_menu(min_count=0) -> dict:
     menu = {}
     categories = Category.objects.all()
     for category in categories:
         products = Product.objects.filter(category=category).filter(count__gte=min_count)
-        if category != 'Завтраки':
+        if not products:
+            continue
+        if category != 'Завтраки' or (category == 'Завтраки' and is_breakfast_time()):
             menu[category.name] = [
                 {'id': product.id,
                  'name': product.name,
-                 'image': product.image,
+                 'image': product.image.url,
                  'price': product.price,
                  'weight': product.weight} for product in products
             ]
-        else:
-            breakfast[category.name] = [
-                {'id': product.id,
-                 'name': product.name,
-                 'image': product.image,
-                 'price': product.price,
-                 'weight': product.weight} for product in products
-            ]
-    return breakfast, menu
+    return menu
 
 
 def is_breakfast_time() -> bool:

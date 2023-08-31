@@ -27,22 +27,22 @@ class Product(models.Model):
     weight = models.IntegerField(verbose_name='Вес')
     price = models.IntegerField(verbose_name='Цена')
     description = models.TextField(verbose_name='Описание')
-    fats = models.IntegerField(verbose_name='Жиры', null=True)
-    protein = models.IntegerField(verbose_name='Белки', null=True)
-    carbohydrates = models.IntegerField(verbose_name='Углеводы', null=True)
-    image = models.CharField(verbose_name='Сылка на изображение', max_length=150)
-    uuid = models.CharField(verbose_name='UUID блюда', null=True, blank=True, max_length=40)
-    price_list_id = models.IntegerField(verbose_name='Идентификатор прайс-листа', blank=True)
+    fats = models.IntegerField(verbose_name='Жиры', null=True, blank=True)
+    protein = models.IntegerField(verbose_name='Белки', null=True, blank=True)
+    carbohydrates = models.IntegerField(verbose_name='Углеводы', null=True, blank=True)
+    image = models.ImageField(verbose_name='Сылка на изображение', max_length=150, upload_to=f'product/')
+    uuid = models.CharField(verbose_name='UUID блюда', null=True, max_length=40, blank=True)
+    price_list_id = models.IntegerField(verbose_name='Идентификатор прайс-листа', blank=True, null=True)
 
     def __str__(self):
-        return f'{self.name} ({self.category_id})'
+        return f'{self.name} ({self.category.name})'
 
     class Meta:
         verbose_name = 'Блюдо'
         verbose_name_plural = 'Блюда'
 
 
-class Additive(models.Model):
+class Addition(models.Model):
     name = models.CharField(max_length=25, verbose_name='Название допника')
     price = models.IntegerField(verbose_name='Цена')
     image = models.CharField(verbose_name='Сылка на изображение', max_length=150)
@@ -56,8 +56,8 @@ class Additive(models.Model):
         verbose_name_plural = 'Дополнения'
 
 
-class AdditiveToDish(models.Model):
-    addition = models.ForeignKey(Additive,
+class AdditionToDish(models.Model):
+    addition = models.ForeignKey(Addition,
                                  on_delete=models.PROTECT,
                                  verbose_name='Дополнение',
                                  )

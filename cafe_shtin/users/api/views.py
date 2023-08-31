@@ -1,14 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
 
-from cafe_shtin.sbis_presto.presto import CardUser, SbisUser
-from .serializers import CheckUserSerializer, LoginSerializer
+from cafe_shtin.sbis_presto.presto import SbisUser
+from .serializers import CheckUserSerializer
 
 
 class CheckUser(APIView):
     """
-    Проверяет наличия пользователя в системе и
+    Проверяет наличия пользователя в системе
     """
     def get(self, request, format=None):
         phone = request.GET['phone']
