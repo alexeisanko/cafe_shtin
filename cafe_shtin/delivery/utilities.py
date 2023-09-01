@@ -5,11 +5,12 @@ from cafe_shtin.delivery.models import Category, Product
 def get_actual_menu(min_count=0) -> dict:
     menu = {}
     categories = Category.objects.all()
+    breakfast = is_breakfast_time()
     for category in categories:
         products = Product.objects.filter(category=category).filter(count__gte=min_count)
         if not products:
             continue
-        if category != 'Завтраки' or (category == 'Завтраки' and is_breakfast_time()):
+        if category.name != 'Завтраки' or (category.name == 'Завтраки' and breakfast):
             menu[category.name] = [
                 {'id': product.id,
                  'name': product.name,

@@ -3,14 +3,15 @@
 
 {% block css %}
   <link rel="stylesheet" href="{% static 'css/delivery/home.css' %}">
+  <link rel="stylesheet" href="{% static 'css/delivery/modal_detail_product.css' %}">
   <link rel="stylesheet" href="{% static 'css/delivery/dish_detail.css' %}">
   <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
 {% endblock css %}
 
 {% block javascript %}
-  <script defer src="{% static 'js/delivery/classie.js' %}"></script>
-  <script defer src="{% static 'js/delivery/modalEffects.js' %}"></script>
+
+  <script defer src="{% static 'js/delivery/modal_detail_product.js' %}"></script>
   <script defer src="{% static 'js/delivery/home.js' %}"></script>
 {% endblock javascript %}
 
@@ -29,7 +30,6 @@
       </div>
     </div>
   </div>
-
 
   <main class="main">
     <div class="container">
@@ -56,7 +56,7 @@
               {% for product in products %}
                 <div class="catalog__item item" id="product_{{ product.id }}">
                   <div class="item__img">
-                    <div class="btn md-trigger" data-modal="modal_detail_product">
+                    <div class="btn md-trigger modal_detail_product">
                       <img src="{{ product.image }}" alt="{{ product.name }}">
                     </div>
                   </div>
@@ -91,7 +91,7 @@
               {% for product in products %}
                 <div class="catalog__item item" id="product_{{ product.id }}">
                   <div class="item__img">
-                    <div class="btn md-trigger" data-modal="modal_detail_product">
+                    <div class="btn md-trigger modal_detail_product">
                       <img src="{{ product.image }}" alt="{{ product.name }}" class="stop_dish">
                     </div>
                   </div>
@@ -107,10 +107,44 @@
     </div>
   </main>
 
+
+
+  {#  #}
+  {% comment %}{% endcomment %}
+
+
+
+
 {% endblock content %}
 
 {% block modal %}
   {% if is_open %}
+    <div class="modal micromodal-slide" id="modal_detail_product" aria-hidden="true">
+    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+        <header class="modal__header">
+          <h2 class="modal__title" id="modal-1-title">
+            Micromodal
+          </h2>
+          <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+        </header>
+        <main class="modal__content" id="modal-1-content">
+          <p>
+            Try hitting the <code>tab</code> key and notice how the focus stays within the modal itself. Also,
+            <code>esc</code> to close modal.
+          </p>
+        </main>
+        <footer class="modal__footer">
+          <button class="modal__btn modal__btn-primary">Continue</button>
+          <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window">Close</button>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+
+
+
     <div class="md-modal md-effect" id="modal_detail_product">
       <div class="md-content">
         <div class="modal-header1">
