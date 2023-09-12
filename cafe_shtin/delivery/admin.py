@@ -6,15 +6,15 @@ class AdditionAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
 
-class AdditionDishInline(admin.TabularInline):
-    model = models.AdditionToDish
-    raw_id_fields = ['addition_id']
+class AdditionProductInline(admin.TabularInline):
+    model = models.AdditionToProduct
+    raw_id_fields = ['addition']
 
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'category_id', 'price')
     search_fields = ('name', 'category_id', 'price')
-    inlines = (AdditionDishInline,)
+    inlines = (AdditionProductInline,)
 
 
 class CategoryAdmin(admin.ModelAdmin):

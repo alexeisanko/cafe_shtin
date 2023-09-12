@@ -27,9 +27,8 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js"></script>
-  <script defer src="{% static 'js/owl.carousel.min.js' %}"></script>
-  <script defer src="{% static 'js/carousel.js' %}"></script>
   <script defer src="{% static 'js/base.js' %}"></script>
+  <script defer src="{% static 'js/modal/modal_base.js' %}"></script>
   <script src="{% static 'js/users/login.js' %}"></script>
   {% block javascript %}{% endblock javascript %}
 </head>
@@ -74,10 +73,10 @@
               <svg class="icon icons__basket">
                 <use xlink:href="/../static/images/menu/sprite.svg#basket"></use>
               </svg>
-              {% if cart.get_total_count_dishes %}
-                <span class="basket__media" style="display: flex">{{ cart.get_total_count_dishes }}</span>
+              {% if cart.get_total_count_products %}
+                <span class="basket__media" style="display: flex">{{ cart.get_total_count_products }}</span>
               {% else %}
-                <span class="basket__media">{{ cart.get_total_count_dishes }}</span>
+                <span class="basket__media">{{ cart.get_total_count_products }}</span>
               {% endif %}
               <span class="basket__price">{{ cart.get_total_price }} ₽</span>
             </div>

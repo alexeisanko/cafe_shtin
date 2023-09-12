@@ -32,9 +32,3 @@ MicroModal.init({
     awaitCloseAnimation: false, // [7]
     debugMode: true // [8]
   });
-
-
-var button = document.querySelector('.modal_detail_product');
-button.addEventListener('click', function(){
-  MicroModal.show('modal_detail_product');
-});

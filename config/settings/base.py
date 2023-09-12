@@ -25,7 +25,7 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 # In Windows, this must be set to your system time zone.
 TIME_ZONE = "Europe/Moscow"
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = "ru"
+LANGUAGE_CODE = "ru-RU"
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
@@ -36,6 +36,7 @@ USE_L10N = True
 USE_TZ = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#locale-paths
 LOCALE_PATHS = [str(ROOT_DIR / "locale")]
+
 
 # DATABASES
 # ------------------------------------------------------------------------------
@@ -210,6 +211,8 @@ SECURE_BROWSER_XSS_FILTER = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#x-frame-options
 X_FRAME_OPTIONS = "DENY"
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 # EMAIL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
@@ -309,3 +312,6 @@ SPECTACULAR_SETTINGS = {
 # ------------------------------------------------------------------------------
 # SbisCRM settings
 CARD_TYPE_UUID ="16f7b6d9-7908-443e-82f8-d22e45c31508"
+
+
+

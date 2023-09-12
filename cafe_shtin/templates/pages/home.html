@@ -1,17 +1,18 @@
 {% extends "base.html" %}
 {% load static %}
+{% load filters %}
 
 {% block css %}
   <link rel="stylesheet" href="{% static 'css/delivery/home.css' %}">
-  <link rel="stylesheet" href="{% static 'css/delivery/modal_detail_product.css' %}">
-  <link rel="stylesheet" href="{% static 'css/delivery/dish_detail.css' %}">
+  <link rel="stylesheet" href="{% static 'css/modal/modal_detail_product.css' %}">
   <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
 {% endblock css %}
 
 {% block javascript %}
-
-  <script defer src="{% static 'js/delivery/modal_detail_product.js' %}"></script>
+  <script defer src="{% static 'js/owl.carousel.min.js' %}"></script>
+  <script defer src="{% static 'js/carousel.js' %}"></script>
+  <script defer src="{% static 'js/modal/modal_detail_product.js' %}"></script>
   <script defer src="{% static 'js/delivery/home.js' %}"></script>
 {% endblock javascript %}
 
@@ -56,21 +57,22 @@
               {% for product in products %}
                 <div class="catalog__item item" id="product_{{ product.id }}">
                   <div class="item__img">
-                    <div class="btn md-trigger modal_detail_product">
+                    <div class="modal_detail_product">
                       <img src="{{ product.image }}" alt="{{ product.name }}">
                     </div>
                   </div>
                   <p class="item__title">{{ product.name }}</p>
                   <span class="item__price">{{ product.price }} ₽ / {{ product.weight }} гр</span>
                   {% if product.id in cart.cart %}
-                    {% with product_id=product.id %}
+                    {% with info_cart=cart|get_info_cart:product.id %}
                       <div class="item__btn" style="display: none">Добавить в корзину</div>
                       <div class="item__hide" style="display: flex">
-                        <span class="item__cost">{{ cart.cart.product_id.total }} ₽</span>
+                        <span class="item__cost">{{ info_cart.total }} ₽</span>
                         <div class="item__count">
-                          <span class="item__remove"><img src="{% static 'images/menu/minus.svg' %}" alt="minus"></span>
-                          <span class="item__count">{{ cart.cart.product_id.quantity }} шт</span>
-                          <span class="item__add"><img src="{% static 'images/menu/plus.svg' %}" alt="plus"></span>
+                          <span class="item__remove"><img src="{% static 'images/products/minus.svg' %}"
+                                                          alt="minus"></span>
+                          <span class="item__count">{{ info_cart.quantity }} шт</span>
+                          <span class="item__add"><img src="{% static 'images/products/plus.svg' %}" alt="plus"></span>
                         </div>
                       </div>
                     {% endwith %}
@@ -79,9 +81,10 @@
                     <div class="item__hide">
                       <span class="item__cost">0 ₽</span>
                       <div class="item__count">
-                        <span class="item__remove"><img src="{% static 'assets/img/minus.svg' %}" alt="minus"></span>
+                        <span class="item__remove"><img src="{% static 'images/products/minus.svg' %}"
+                                                        alt="minus"></span>
                         <span class="item__count">0 шт</span>
-                        <span class="item__add"><img src="{% static 'assets/img/plus.svg' %}" alt="plus"></span>
+                        <span class="item__add"><img src="{% static 'images/products/plus.svg' %}" alt="plus"></span>
                       </div>
                     </div>
                   {% endif %}
@@ -91,7 +94,7 @@
               {% for product in products %}
                 <div class="catalog__item item" id="product_{{ product.id }}">
                   <div class="item__img">
-                    <div class="btn md-trigger modal_detail_product">
+                    <div class="modal_detail_product">
                       <img src="{{ product.image }}" alt="{{ product.name }}" class="stop_dish">
                     </div>
                   </div>
@@ -101,7 +104,6 @@
               {% endfor %}
             {% endif %}
           {% endfor %}
-          <div class="md-overlay"></div>
         </div>
       </div>
     </div>
@@ -118,76 +120,32 @@
 {% endblock content %}
 
 {% block modal %}
-  {% if is_open %}
-    <div class="modal micromodal-slide" id="modal_detail_product" aria-hidden="true">
+  <div class="modal micromodal-slide" id="modal_detail_product" aria-hidden="true">
     <div class="modal__overlay" tabindex="-1" data-micromodal-close>
-      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
-        <header class="modal__header">
-          <h2 class="modal__title" id="modal-1-title">
-            Micromodal
-          </h2>
-          <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+      <div class="modal__container">
+        <header>
+          <span class="close" data-micromodal-close>x</span>
         </header>
         <main class="modal__content" id="modal-1-content">
-          <p>
-            Try hitting the <code>tab</code> key and notice how the focus stays within the modal itself. Also,
-            <code>esc</code> to close modal.
-          </p>
+          <div class="modal__img"><img src='' alt="product_name" class="img" width="380px" height="380px"></div>
+          <div class="modal__title">
+            <p class="modal__name"><br>product_name</p>
+            <p class="modal__cost">product_cost ₽</p>
+          </div>
+          <p class="modal__text">product_description</p>
+          {% if is_open %}
+            <div class="modal__add">
+              <div class="modal__count count">
+                <span class="count__minus"><img src="{% static '/images/products/minus.svg' %}" alt="-"></span>
+                <span class="count__text">1 шт</span>
+                <span class="count__plus"><img src="{% static '/images/products/plus.svg' %}" alt="+"></span>
+              </div>
+              <div class="count__btn">Добавить в корзину</div>
+            </div>
+          {% endif %}
         </main>
-        <footer class="modal__footer">
-          <button class="modal__btn modal__btn-primary">Continue</button>
-          <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window">Close</button>
-        </footer>
+        <footer></footer>
       </div>
     </div>
   </div>
-
-
-
-
-    <div class="md-modal md-effect" id="modal_detail_product">
-      <div class="md-content">
-        <div class="modal-header1">
-          <span class="md-close close">x</span>
-        </div>
-        <div class="modal-body">
-          <div class="modal__img"><img src="" alt="product_name" class="img"
-                                       width="380px"
-                                       height="380px"></div>
-          <div class="modal__title">
-            <p class="modal__name"><br>product_name</p>
-            <p class="modal__cost">product_cost ₽</p>
-          </div>
-          <p class="modal__text">product_description</p>
-          <div class="modal__add">
-            <div class="modal__count count">
-              <span class="count__minus"><img src="{% static '/images/products/minus.svg' %}" alt="minus"></span>
-              <span class="count__text">1 шт</span>
-              <span class="count__plus"><img src="{% static '/images/products/plus.svg' %}" alt="plus"></span>
-            </div>
-            <div class="count__btn" id="detailbtndish_{{ dish.id }}" api="">
-              Добавить в корзину
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  {% else %}
-    <div class="md-modal md-effect" id="modal_detail_product">
-      <div class="md-content">
-        <div class="modal-header1">
-          <span class="md-close close">x</span>
-        </div>
-        <div class="modal-body">
-          <div class="modal__img"><img src="" alt="product_name" class="img" width="380px"
-                                       height="380px"></div>
-          <div class="modal__title">
-            <p class="modal__name"><br>product_name</p>
-            <p class="modal__cost">product_cost ₽</p>
-          </div>
-          <p class="modal__text">product_description</p>
-        </div>
-      </div>
-    </div>
-  {% endif %}
 {% endblock modal %}

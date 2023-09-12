@@ -12,7 +12,7 @@ def get_actual_menu(min_count=0) -> dict:
             continue
         if category.name != 'Завтраки' or (category.name == 'Завтраки' and breakfast):
             menu[category.name] = [
-                {'id': product.id,
+                {'id': str(product.id),
                  'name': product.name,
                  'image': product.image.url,
                  'price': product.price,

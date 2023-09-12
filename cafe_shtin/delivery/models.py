@@ -45,7 +45,7 @@ class Product(models.Model):
 class Addition(models.Model):
     name = models.CharField(max_length=25, verbose_name='Название допника')
     price = models.IntegerField(verbose_name='Цена')
-    image = models.CharField(verbose_name='Сылка на изображение', max_length=150)
+    image = models.ImageField(verbose_name='Изображение', max_length=150)
 
     def __str__(self):
         return f'{self.name}'
@@ -56,18 +56,18 @@ class Addition(models.Model):
         verbose_name_plural = 'Дополнения'
 
 
-class AdditionToDish(models.Model):
+class AdditionToProduct(models.Model):
     addition = models.ForeignKey(Addition,
                                  on_delete=models.PROTECT,
                                  verbose_name='Дополнение',
                                  )
-    dish = models.ForeignKey(Product,
-                             on_delete=models.CASCADE,
-                             verbose_name='Блюдо в которое входит дополнение',
-                             )
+    product = models.ForeignKey(Product,
+                                on_delete=models.CASCADE,
+                                verbose_name='Блюдо в которое входит дополнение',
+                                )
 
     def __str__(self):
-        return f'{self.dish.name} ({self.addition.name})'
+        return f'{self.product.name} ({self.addition.name})'
 
     class Meta:
         ordering = ('addition',)

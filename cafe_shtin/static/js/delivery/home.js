@@ -1,123 +1,12 @@
 $(document).ready(function () {
 
+    // Animations for scroll categories
     $('.category:first').addClass('category--active')
     let indent = ($('.header').height()) + 20
     let category_coord = []
     for (let category of $('.change-category')) {
         category_coord.unshift({coord: $(category).offset(), name: category.id})
     }
-
-
-    $('.item__btn').click(function () {
-        $(this).siblings('.item__hide').css('display', 'flex');
-        $(this).css('display', 'none');
-        const dish_id = $(this).attr('id')
-        const api = $(this).attr('api')
-        $.ajax({
-            type: 'POST',
-            url: api,
-            dataType: 'json',
-            data: {
-                'dish_id': dish_id
-            },
-            success: function (data) {
-                $('#countdish_' + data.id).text(data.quantity);
-                $('#costdish_' + data.id).text(data.total_price_dishes);
-                $('.basket__price').text(data.total_price_order);
-                $('.basket__media').css('display', 'flex')
-                $('.basket__media').text(data.total_count_dishes)
-
-            },
-            error: function (data) {
-                console.log(data)
-            }
-        });
-    });
-
-    $('.item__add').click(function () {
-        const dish_id = $(this).siblings('.item__count').attr('id')
-        $.ajax({
-            type: 'POST',
-            url: 'basket/add_dish/',
-            dataType: 'json',
-            data: {
-                'dish_id': dish_id
-            },
-            success: function (data) {
-                $('#countdish_' + data.id).text(data.quantity);
-                $('#costdish_' + data.id).text(data.total_price_dishes);
-                $('.basket__price').text(data.total_price_order);
-                $('.basket__media').css('display', 'flex')
-                $('.basket__media').text(data.total_count_dishes)
-            },
-        });
-    });
-
-    $('.item__remove').click(function () {
-        const dish_id = $(this).siblings('.item__count').attr('id')
-        $.ajax({
-            type: 'POST',
-            url: 'basket/sub_dish/',
-            dataType: 'json',
-            data: {
-                'dish_id': dish_id
-            },
-            success: function (data) {
-                if (data.quantity == '0 шт') {
-                    $('#btndish_' + data.id).css('display', 'flex');
-                    $('#btndish_' + data.id).siblings('.item__hide').css('display', 'none');
-                } else {
-                    $('#countdish_' + data.id).text(data.quantity);
-                    $('#costdish_' + data.id).text(data.total_price_dishes);
-                }
-                $('.basket__price').text(data.total_price_order);
-                if (data.total_count_dishes === 0) {
-                    $('.basket__media').css('display', 'none')
-                }
-                $('.basket__media').text(data.total_count_dishes)
-            },
-        });
-    });
-
-    $('.count__plus').click(function () {
-        const text = $(this).siblings('.count__text').text()
-        var count = parseInt(text.match(/\d+/))
-        $(this).siblings('.count__text').text(count + 1 + ' шт')
-    });
-
-    $('.count__minus').click(function () {
-        const text = $(this).siblings('.count__text').text()
-        var count = parseInt(text.match(/\d+/))
-        if (count - 1 === 0) {
-            $(this).siblings('.count__text').text(1 + ' шт')
-        } else {
-            $(this).siblings('.count__text').text(count - 1 + ' шт')
-        }
-    });
-
-    $('.count__btn').click(function () {
-        const dish_id = $(this).attr('id')
-        const api = $(this).attr('api')
-        const count = $(this).siblings('.modal__count').children('.count__text').text()
-        $.ajax({
-            type: 'POST',
-            url: api,
-            dataType: 'json',
-            data: {
-                'dish_id': dish_id,
-                'count': count
-            },
-            success: function (data) {
-                $('#modal' + data.id).removeClass('md-show');
-                $('#countdish_' + data.id).text(data.quantity);
-                $('#costdish_' + data.id).text(data.total_price_dishes);
-                $('.basket__price').text(data.total_price_order);
-                $('#btndish_' + data.id).siblings('.item__hide').css('display', 'flex');
-                $('#btndish_' + data.id).css('display', 'none');
-                $('.basket__media').text(data.total_count_dishes)
-            },
-        });
-    });
 
     $(".categories").on("click", "a", function (event) {
         event.preventDefault();
@@ -138,7 +27,100 @@ $(document).ready(function () {
             }
         }
     })
+
+    // Change product in cart
+    $('.item__btn').click(function () {
+        let $product = $(this).parent('div')
+        UpdateBasket($product = $product, quantity = 1)
+    });
+
+    $('.item__add').click(function () {
+        let $product = $(this).parent('div').parent('div').parent('div')
+        UpdateBasket($product = $product, quantity = 1)
+    });
+
+    $('.item__remove').click(function () {
+        let $product = $(this).parent('div').parent('div').parent('div')
+        UpdateBasket($product = $product, quantity = -1)
+    });
+
+    $('.count__plus').click(function () {
+        const text = $(this).siblings('.count__text').text()
+        var count = parseInt(text.match(/\d+/))
+        $(this).siblings('.count__text').text(count + 1 + ' шт')
+    });
+
+    $('.count__minus').click(function () {
+        const text = $(this).siblings('.count__text').text()
+        var count = parseInt(text.match(/\d+/))
+        if (count - 1 === 0) {
+            $(this).siblings('.count__text').text(1 + ' шт')
+        } else {
+            $(this).siblings('.count__text').text(count - 1 + ' шт')
+        }
+    });
+
+    $('.count__btn').click(function () {
+        let product_id = Number($(this).attr('id').slice($(this).attr('id').indexOf('_') + 1))
+        let $product = $(`#product_${product_id}`)
+        let quantity_media = $(this).siblings('.modal__count').children('.count__text').text()
+        let quantity = Number(quantity_media.slice(0, quantity_media.indexOf(' ')))
+        UpdateBasket($product = $product, quantity = quantity)
+        MicroModal.close('modal_detail_product')
+    });
+
+    function UpdateProductMedia($product, data) {
+        $product.children('.item__hide').children('.item__cost').text(`${data.total_price_product} ₽`)
+        $product.children('.item__hide').children('.item__count').children('.item__count').text(`${data.quantity} шт`)
+        if (data.quantity === 0) {
+            $product.children('.item__btn').css('display', 'flex');
+            $product.children('.item__hide').css('display', 'none');
+        } else {
+            $product.children('.item__btn').css('display', 'none');
+            $product.children('.item__hide').css('display', 'flex');
+        }
+    }
+
+    function UpdateBasketMedia(data) {
+        if (data.total_count_product === 0) {
+            $('.basket__media').css('display', 'none')
+        } else {
+            $('.basket__media').css('display', 'flex')
+        }
+        $('.basket__price').text(`${data.total_price_order} ₽`);
+        $('.basket__media').text(data.total_count_product)
+
+    }
+
+    function UpdateHTML($product, data) {
+        UpdateProductMedia($product, data)
+        UpdateBasketMedia(data)
+    }
+
+    function GetURL(product_id, quantity) {
+        let url = new URL('http://127.0.0.1:8000/change_basket/');
+        url.searchParams.set('product_id', product_id)
+        url.searchParams.set('quantity', quantity)
+        return url
+    }
+
+    function UpdateBasket($product, quantity) {
+        let product_id = Number($product.attr('id').slice($product.attr('id').indexOf('_') + 1))
+        let url = GetURL(product_id, quantity)
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success: function (data) {
+                console.log(data)
+                UpdateHTML($product, data)
+            },
+            error: function (data) {
+                alert('Не удалось добавить продукт')
+            }
+        });
+    }
 })
+
 
 
 
