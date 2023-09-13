@@ -5,11 +5,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import login, authenticate
 from django.views.generic import DetailView
-from django.http import JsonResponse, HttpRequest
+from django.http import HttpRequest, JsonResponse
 from rest_framework.response import Response
-from rest_framework import status
 
-from cafe_shtin.users.api.serializers import LoginSerializer
+from cafe_shtin.users.api.serializers import LoginSerializer, CheckUserSerializer
 from cafe_shtin.sbis_presto.presto import CardUser
 
 User = get_user_model()
@@ -26,7 +25,12 @@ profile_user_view = ProfileUserView.as_view()
 
 
 class UserLoginView(LoginView):
-    template_name = "users/login.html"
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> Response:
+        serializer = CheckUserSerializer(data=request.GET)
+        if serializer.is_valid():
+            pass
+        print(serializer.errors)
+        return JsonResponse(serializer.errors)
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> Response:
         serializer = LoginSerializer(data=request.POST)
@@ -46,7 +50,7 @@ class UserLoginView(LoginView):
                                               code=data['birthday'])
                 if is_user:
                     user = login(request)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors)
 
     def _get_uniq_code(self, phone, name, birthday):
         user = CardUser(phone=phone, name=name, birthday=birthday)

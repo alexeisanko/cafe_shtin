@@ -2,14 +2,11 @@ from rest_framework import serializers
 
 
 class CheckUserSerializer(serializers.Serializer):
-    is_user = serializers.BooleanField(read_only=True, default=False)
-    phone = serializers.CharField(read_only=True)
-    name = serializers.CharField(read_only=True, required=False)
-    birthday = serializers.DateField(read_only=True, required=False)
+    is_user = serializers.BooleanField(default=False)
+    phone = serializers.CharField()
 
 
 class LoginSerializer(serializers.Serializer):
-    method = serializers.CharField()
     is_user = serializers.BooleanField()
     phone = serializers.CharField()
     name = serializers.CharField()

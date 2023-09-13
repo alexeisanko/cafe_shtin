@@ -9,13 +9,14 @@
 {% endblock css %}
 
 {% block javascript %}
+  <script src="https://api-maps.yandex.ru/2.1/?apikey=265fda5e-4f09-49c8-a141-205b2776d1fa&lang=ru_RU"
+  type="text/javascript">
+  </script>
+  <script src="{% static 'js/delivery/api-yandex.js' %}"></script>
   <script defer src="{% static 'js/owl.carousel.min.js' %}"></script>
   <script defer src="{% static 'js/carousel.js' %}"></script>
   <script src="{% static 'js/modal/modal_order.js' %}"></script>
   <script src="{% static 'js/delivery/basket.js' %}"></script>
-  {#  <script src="{% static 'js/delivery/order.js' %}"></script>#}
-  {#  <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey={{ yandex_map_key }}"#}
-  {#          type="text/javascript"></script>#}
 {% endblock javascript %}
 
 
@@ -31,7 +32,7 @@
               <span class="cashback__num summary__num">{{ cart.get_received_cashback }} ₽ </span>
             </div>
             <div class="delivery summary__item">
-              <span class="delivery__title summary__title">Доставка <img src="{% static "assets/img/info.svg" %}"
+              <span class="delivery__title summary__title">Доставка <img src="{% static "images/basket/info.svg" %}"
                                                                          alt="i" class="delivery__img"></span>
               <span class="delivery__num summary__num">Бесплатно</span>
             </div>
@@ -55,7 +56,7 @@
           {% elif user.is_authenticated %}
             <div class="summary__btn open-order modal_order">Перейти к оформлению</div>
           {% else %}
-            <div class="summary__btn modal_order">Перейти к оформлению</div>
+            <div class="summary__btn modal_authentication">Перейти к оформлению</div>
           {% endif %}
 
         </div>
@@ -154,11 +155,9 @@
           </div>
           <div class="address">
             <div class="address__change">
-              <h3 class="address__title">Выбрать адрес</h3>
+              <h3 class="address__title">Выберите адрес</h3>
               <div class="info-about-shop" style="display: none">
-                <h4>{{ shop.name }}</h4>
-                <br>
-                <span><strong>Адрес:</strong>{{ shop.address }}</span>
+                <br> <span></span>
               </div>
               {% for address in addresses %}
                 <div class="address__radio radio">
@@ -174,7 +173,6 @@
             <div class="address__new check-new-address">
               <input id="suggest-address" class="address__inp address__inp--big new_street_home" type="text"
                      placeholder="Адрес">
-              <div id="map" style="display: none"></div>
               <div class="address__dop">
                 <input class="address__inp new_entrance" type="text" placeholder="Подъезд">
                 <input class="address__inp new_floor" type="text" placeholder="Этаж">

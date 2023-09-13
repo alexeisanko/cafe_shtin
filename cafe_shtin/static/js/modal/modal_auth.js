@@ -1,21 +1,16 @@
 $(document).ready(function () {
-    $('.user_login').click(function (event) {
-        let $this = this
-        event.preventDefault();
-        this.blur(); // Manually remove focus from clicked link.
-        $.get(this.href, function (html) {
-            $(html).appendTo('body').modal();
-            $('#next_page').attr('value', $($this).attr('next_page'))
-            $(".phone-user:last").mask("+7 (999) 999-99-99");
-        });
-    });
+    $('.modal_authentication').click(function () {
+        MicroModal.show('modal_authentication');
+        $(".phone-user").mask("+7 (999) 999-99-99");
+    })
 
 
     $(document).on("submit", "form", function (event) {
         let $form = $(this);
+        let url = "http://127.0.0.1:8000/users/login/"
         $.ajax({
-            type: 'POST',
-            url: $form.attr('action'),
+            type: 'GET',
+            url: url,
             dataType: 'json',
             data: $form.serialize(),
             success: function (data) {
