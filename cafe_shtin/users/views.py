@@ -1,66 +1,79 @@
-from typing import Any
+from typing import Any, Dict
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth import login, authenticate
-from django.views.generic import DetailView
+from django.views.generic import TemplateView
 from django.http import HttpRequest, JsonResponse
-from rest_framework.response import Response
+from django.conf import settings
 
-from cafe_shtin.users.api.serializers import LoginSerializer, CheckUserSerializer
+from cafe_shtin.users.api.serializers import LoginSerializer
 from cafe_shtin.sbis_presto.presto import CardUser
 
 User = get_user_model()
 
 
-class ProfileUserView(LoginRequiredMixin, DetailView):
-    template_name = "users/profile.html"
-    model = User
-    slug_field = "username"
-    slug_url_kwarg = "username"
+class ProfileUserView(LoginRequiredMixin, TemplateView):
+    template_name = "pages/profile.html"
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        return context
 
 
 profile_user_view = ProfileUserView.as_view()
 
 
 class UserLoginView(LoginView):
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> Response:
-        serializer = CheckUserSerializer(data=request.GET)
-        if serializer.is_valid():
-            pass
-        print(serializer.errors)
-        return JsonResponse(serializer.errors)
 
-    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> Response:
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         serializer = LoginSerializer(data=request.POST)
         if serializer.is_valid():
             data = serializer.data
-            if data['method'] == 'verify_phone':
+            if data['method'] == 'get_code':
                 uniq_id = self._get_uniq_code(phone=data['phone'],
-                                              name=data['name'],
+                                              name=data['username'],
                                               birthday=data['birthday'])
-                serializer.uniq_id = uniq_id
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                data['uniq_id'] = uniq_id
+                return JsonResponse(data)
             if data['method'] == 'confirm_phone':
-                is_user = self._confirm_phone(phone=data['phone'],
-                                              name=data['name'],
-                                              birthday=data['birthday'],
-                                              uniq_id=data['birthday'],
-                                              code=data['birthday'])
-                if is_user:
-                    user = login(request)
-        return Response(serializer.errors)
+                user, passed = self._confirm_phone(phone=data['phone'],
+                                                   name=data['username'],
+                                                   birthday=data['birthday'],
+                                                   uniq_id=data['uniq_id'],
+                                                   code=data['code_user'])
+                if passed:
+                    # user = authenticate(request, phone=user.phone, password=None)
+                    login(request, user)
+                    return JsonResponse({'passed': 'passed'})
+        return JsonResponse(serializer.errors)
 
-    def _get_uniq_code(self, phone, name, birthday):
-        user = CardUser(phone=phone, name=name, birthday=birthday)
-        uniq_id = user.verify_phone()
+    @staticmethod
+    def _get_uniq_code(phone, name, birthday):
+        if settings.CONNECT_SBIS:
+            user = CardUser(phone=phone, name=name, birthday=birthday)
+            uniq_id = user.verify_phone()
+        else:
+            uniq_id = 4321
         return uniq_id
 
-    def _confirm_phone(self, phone, name, birthday, uniq_id, code):
-        user = CardUser(phone=phone, name=name, birthday=birthday)
-        get_or_create_user = user.get_or_create_user(uniq_id=uniq_id, code_user=code)
-        return get_or_create_user
+    @staticmethod
+    def _confirm_phone(phone, name, birthday, uniq_id, code):
+        if settings.CONNECT_SBIS:
+            user = CardUser(phone=phone, name=name, birthday=birthday)
+            user, passed = user.get_or_create_user(uniq_id=uniq_id, code_user=code)
+        else:
+            user, created = User.objects.get_or_create(phone=phone, defaults={"username": name, 'birthday': birthday})
+            passed = True
+        return user, passed
 
 
 user_login_view = UserLoginView.as_view()
+
+
+class UserLogoutView(LoginRequiredMixin, LogoutView):
+    pass
+
+
+user_logout_view = UserLogoutView.as_view()

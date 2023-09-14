@@ -4,39 +4,76 @@ $(document).ready(function () {
         $(".phone-user").mask("+7 (999) 999-99-99");
     })
 
-
-    $(document).on("submit", "form", function (event) {
+    $(document).on("submit", "#form_login", function (event) {
         let $form = $(this);
-        let url = "http://127.0.0.1:8000/users/login/"
+        let url = "http://127.0.0.1:8000/users/check_user/"
         $.ajax({
             type: 'GET',
             url: url,
             dataType: 'json',
             data: $form.serialize(),
             success: function (data) {
-                if (data['errors']) {
-                    for (let error in data['errors']) {
-                        console.log(data['errors'][error])
-                        alert(data['errors'][error])
-                    }
-                } else if ($form.attr('id') === "form_login") {
-                    event.preventDefault();
-                    $.get(`${this.url}confirm/`, function (html) {
-                        $(html).appendTo('body').modal();
-                        $('#next_page_confirm').attr('value', $('#next_page_login').attr('value'))
-                        $('#number_user_confirm').attr('value', data['user'])
-                    })
-                } else if ($form.attr('id') === "form_confirm") {
-
-                    if (data['next_page'].includes("basket")) {
-                        sessionStorage.setItem('is_open_order', "True")
-                        location.reload()
-                    } else if (data['next_page'].includes("account")) {
-                        location.replace(data['next_page'])
-                    }
+                console.log(data)
+                switch (data.is_user) {
+                    case false:
+                        $('.birthday-user').attr('type', 'date')
+                        $('.name-user').attr('type', 'text')
+                        $('.form__title:first').text('Вы в первый раз?')
+                        $('.extra_field').css('display', 'ruby')
+                        $form.attr('id', 'form_get_code')
+                        break
+                    case true:
+                        GetConfirmCode($form)
+                        break
                 }
+                $('.phone-user').attr('readonly', 'readonly')
             }
         })
         return false
     })
+
+    $(document).on("submit", "#form_confirm_login", function (event) {
+        let $form = $(this);
+        let data = $form.serialize() + '&method=confirm_phone'
+        let url = "http://127.0.0.1:8000/users/confirm_login/"
+        $.ajax({
+            type: 'POST',
+            url: url,
+            dataType: 'json',
+            data: data,
+            success: function (data) {
+                console.log(data)
+                location.reload()
+            }
+        })
+        return false
+    })
+
+    $(document).on("submit", "#form_get_code", function (event) {
+        let $form = $(this);
+        GetConfirmCode($form)
+        return false
+    })
+
+    function GetConfirmCode($form) {
+        let url = "http://127.0.0.1:8000/users/confirm_login/"
+        let data = $form.serialize() + '&method=get_code'
+        $.ajax({
+            type: 'POST',
+            url: url,
+            dataType: 'json',
+            data: data,
+            success: function (data) {
+                console.log(data)
+                $form.attr('id', 'form_confirm_login')
+                $('.birthday-user').val(data.birthday)
+                $('.name-user').val(data.username)
+                $('.form__title:first').text('Введите код из смс?')
+                $('.code-user').attr('type', 'text')
+                $('.uniq-id').val(data.uniq_id)
+            }
+        })
+    }
 })
+
+

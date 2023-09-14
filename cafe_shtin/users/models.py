@@ -38,6 +38,7 @@ class User(AbstractUser):
     username = models.CharField(_('username'), max_length=150)
     password = models.CharField(_('password'), max_length=128, null=True)
     cashback = models.IntegerField(_("Накопленный кешбек"), blank=True, default=0)
+    birthday = models.DateField(_("День рождения"), null=True)
     first_name = None  # type: ignore
     last_name = None  # type: ignore
     email = None  # type: ignore

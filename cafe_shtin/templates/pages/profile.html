@@ -1,2 +1,82 @@
 {% extends "base.html" %}
 {% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/users/profile.css' %}">
+{% endblock css %}
+
+{% block javascript %}
+  <script defer src="{% static 'js/users/profile.js' %}"></script>
+{%  endblock javascript %}
+
+{% block content %}
+    <div class="container" style="position: relative; padding-top: 15px;">
+        <section class="profile">
+            <div class="profile__info pinfo">
+                <div class="info__fio">
+
+                        <h3 class="info__name">{{ user.username }}</h3>
+
+                    <img src="{% static 'images/profile/change.svg' %}" alt="изменить" class="info__img">
+                    <a href="{% url 'users:logout' %}">Выйти</a>
+                </div>
+                <div class="info__cash">
+                    <p>Ваш cashback: <span>{{ user.cashback }} ₽</span></p>
+                </div>
+            </div>
+            <div class="profile__data data">
+                <div class="data__item">
+                    <p class="data__title">Телефон</p>
+                    <p class="data__text">{{ user.phone}}</p>
+                </div>
+{#                <div class="data__item">#}
+{#                    <p class="data__title">Почта</p>#}
+{#                    <p class="data__text">{{ user.email|default_if_none:'Введите почту'}}</p>#}
+{#                </div>#}
+                <div class="data__item">
+                    <p class="data__title">День рождения</p>
+                    <p class="data__text">{{ user.birthday }}</p>
+                </div>
+            </div>
+            <div class="profile__address address">
+                <p class="data__title">Адрес</p>
+                {% for address in addresses %}
+                <div class="address__item">
+                    <span class="address__text">{{ address.address}}</span>
+                    <div class="address__btns"><img src="{% static 'images/profile/change.svg' %}" alt="изменить" class="address__change"><img src="{% static 'images/profile/account-basket.svg' %}" alt="удалить" class="address__del"></div>
+                </div>
+                {% endfor %}
+                <div class="address__add">
+                    <h3 class="address__name"><img src="{% static 'images/profile/plus-circle.svg' %}" alt="plus"> <span>Добавить новый адрес</span></h3>
+                    <input class="address__input address__input--big" type="text" placeholder="Улица">
+                    <div class="address__dopinfo">
+                        <input class="address__input" type="text" placeholder="Дом">
+                        <input class="address__input" type="text" placeholder="Подъезд">
+                        <input class="address__input" type="text" placeholder="Этаж">
+                        <input class="address__input" type="text" placeholder="Кв">
+                    </div>
+                </div>
+            </div>
+            <div class="profile__history history">
+                <h2 class="history__title">История заказов</h2>
+                <table class="history__table table">
+                    <tr>
+                        <th>Номер и дата заказа</th>
+                        <th>Адресс доставки</th>
+                        <th>Состав заказа</th>
+                        <th>Статус</th>
+                    </tr>
+                    {% for order in orders %}
+                    <tr>
+                        <td>№{{ order.numbers_order }} от {{ order.date_order }}</td>
+                        <td>{{ order.address }}</td>
+                        <td>Посмотреть</td>
+                        <td>{{ order.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </section>
+    </div>
+
+{% endblock content %}

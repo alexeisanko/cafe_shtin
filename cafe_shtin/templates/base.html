@@ -121,7 +121,8 @@
 
 {% block modal %}{% endblock modal %}
 
-
+{% if user.is_authenticated %}
+{% else %}
 <div class="modal modal-login micromodal-slide " id="modal_authentication" aria-hidden="true">
   <div class="modal__overlay" tabindex="-1" data-micromodal-close>
     <div>
@@ -133,16 +134,22 @@
           </p>
           <form action="#" class="form" method="post" id="form_login">
             <h2 class="form__title">Авторизация</h2>
-            {% for field in user_form %}
-              <div class="fieldWrapper">
-                <font color="#ff8c00">{{ field.errors | escape }}</font>
-              </div>
-            {% endfor %}
             <input required class="input form__input phone-user" type="tel" placeholder="Введите номер телефона"
-                   name="phone_number">
-            <input type="hidden" name="birthday" value="">
-            <input type="hidden" name="name" value="">
+                   name="phone">
+            <input required class="input form__input code-user" type="hidden" placeholder="Введите код"
+                   name="code_user">
+            <div class="extra_field form__title" style="display: none">
+              <div style="display: grid">
+                <span> Ваше имя</span>
+                <input required class="input__extra form__input name-user" type="hidden" name="username" value="">
+              </div>
+              <div style="display: grid">
+                <span> День рождения</span>
+                <input required class="input__extra form__input birthday-user" type="hidden" name="birthday" value="">
+              </div>
+            </div>
             {% csrf_token %}
+            <input required class="uniq-id" type="hidden" name="uniq_id" value="">
             <input required class="form__input form__btn button button--primary" type="submit" value="Войти"
                    id="send_form_login">
           </form>
@@ -153,7 +160,7 @@
     </div>
   </div>
 </div>
-
+{% endif %}
 {% block inline_javascript %}{% endblock inline_javascript %}
 </body>
 </html>

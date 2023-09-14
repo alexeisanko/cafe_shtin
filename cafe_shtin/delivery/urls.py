@@ -12,3 +12,4 @@ urlpatterns = [
     path('change_basket/', view=change_basket, name="change_basket"),
     path('change_additions_in_basket/', view=change_additions_in_basket, name="change_additions_in_basket")
 ]
+
