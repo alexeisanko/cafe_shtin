@@ -52,11 +52,11 @@
             <p class="summary__price">{{ cart.get_total_price }} ₽</p>
           </div>
           {% if not cart.get_total_price %}
-            <div class="summary__btn modal_order">Перейти к оформлению</div>
+            <div class="summary__btn">Перейти к оформлению</div>
           {% elif user.is_authenticated %}
             <div class="summary__btn open-order modal_order">Перейти к оформлению</div>
           {% else %}
-            <div class="summary__btn modal_authentication">Перейти к оформлению</div>
+            <div class="summary__btn modal_authentication" data-key="next_order">Перейти к оформлению</div>
           {% endif %}
 
         </div>

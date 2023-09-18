@@ -18,16 +18,25 @@
 
 
 {% block content %}
-  <div class="container" style="position: relative; padding-top: 77px;">
-    <div class="owl-carousel owl-theme" id="carousel-promo">
+  <div class="container" style="position: relative; padding-top: 100px; ">
+    <div class="owl-carousel owl-theme" id="carousel-promo" >
       <div class="item">
-        <img src="{% static 'images/carousels/slide-central.png' %}" alt="...">
+        <img src="{% static 'images/carousels/logo-350x440.jpg' %}" alt="..." style="border-radius: 15px">
       </div>
       <div class="item">
-        <img src="{% static 'images/carousels/slide-left.png' %}" alt="...">
+        <img src="{% static 'images/carousels/1logo-350x440.jpg' %}" alt="...">
       </div>
       <div class="item">
-        <img src="{% static 'images/carousels/slide-right.png' %}" alt="...">
+        <img src="{% static 'images/carousels/2logo-350x440.jpg' %}" alt="...">
+      </div>
+      <div class="item">
+        <img src="{% static 'images/carousels/4logo-350x440.jpg' %}" alt="...">
+      </div>
+      <div class="item">
+        <img src="{% static 'images/carousels/5logo-350x440.jpg' %}" alt="...">
+      </div>
+      <div class="item">
+        <img src="{% static 'images/carousels/6logo-350x440.jpg' %}" alt="...">
       </div>
     </div>
   </div>
@@ -42,17 +51,17 @@
         <div class="main__categories categories">
           {% for category in menu %}
             <div class="categories__item category">
-              <a href="#{{ category }}" class="nav__item link">
+              <a href="#category_{{ category }}" class="nav__item link">
                 <svg class="icon__category">
-                  <use xlink:href="../static/assets/img/sprite.svg#pizza"></use>
+                  <use xlink:href="../static/images/products/sprite.svg#pizza"></use>
                 </svg>
                 <span class="category__text">{{ category|upper }}</span></a>
             </div>
           {% endfor %}
         </div>
-        <div class="main__catalog catalog">
+        <div class="main__catalog catalog" style="margin-top: -250px">
           {% for category, products in menu.items %}
-            <div class="change-category" id="category_{{ category.id }}" style="width: 100%"></div>
+            <div class="change-category" id="category_{{ category }}" style="width: 100%"></div>
             {% if is_open %}
               {% for product in products %}
                 <div class="catalog__item item" id="product_{{ product.id }}">

@@ -41,22 +41,25 @@ $('.owl-prev').click(function() {
 $('#carousel-promo').owlCarousel({
     mouseDrag: true,
     touchDrag: true,
-    items: 2,
     nav: false,
     dots: false,
     loop: true,
+    margin: 45,
     autoplay: true,
     autoHeight: true,
     autoplayTimeout: 8000,
     autoplayHoverPause: false,
+
     responsive: {
         0: {
-            items: 1,
+            items: 2,
 
         },
         800: {
-            items: 1,
+            items: 4,
 
         },
     }
 });
+
+

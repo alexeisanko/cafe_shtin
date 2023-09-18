@@ -40,6 +40,11 @@ $(document).ready(function () {
         }
     })
 
+
+    if (sessionStorage.getItem('is_open_order') === 'True') {
+        sessionStorage.clear()
+        MicroModal.show('modal_order');
+    }
 })
 
 

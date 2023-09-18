@@ -1,7 +1,15 @@
 $(document).ready(function () {
     $('.modal_authentication').click(function () {
+        let key = this.dataset.key
+        if (key === 'next_order') {
+            sessionStorage.setItem('is_open_order', "True")
+        } else {
+            sessionStorage.setItem('is_open_order', "False")
+        }
         MicroModal.show('modal_authentication');
         $(".phone-user").mask("+7 (999) 999-99-99");
+
+
     })
 
     $(document).on("submit", "#form_login", function (event) {
@@ -13,7 +21,6 @@ $(document).ready(function () {
             dataType: 'json',
             data: $form.serialize(),
             success: function (data) {
-                console.log(data)
                 switch (data.is_user) {
                     case false:
                         $('.birthday-user').attr('type', 'date')
@@ -23,6 +30,8 @@ $(document).ready(function () {
                         $form.attr('id', 'form_get_code')
                         break
                     case true:
+                        $('.birthday-user').val(data.birthday)
+                        $('.name-user').val(data.username)
                         GetConfirmCode($form)
                         break
                 }
@@ -43,7 +52,12 @@ $(document).ready(function () {
             data: data,
             success: function (data) {
                 console.log(data)
-                location.reload()
+                if (sessionStorage.getItem('is_open_order') === 'True') {
+                    location.reload()
+                } else {
+                    location.replace("http://127.0.0.1:8000/users/profile/")
+                }
+
             }
         })
         return false
@@ -66,9 +80,7 @@ $(document).ready(function () {
             success: function (data) {
                 console.log(data)
                 $form.attr('id', 'form_confirm_login')
-                $('.birthday-user').val(data.birthday)
-                $('.name-user').val(data.username)
-                $('.form__title:first').text('Введите код из смс?')
+                $('.form__title:first').text('Введите код из смс')
                 $('.code-user').attr('type', 'text')
                 $('.uniq-id').val(data.uniq_id)
             }
