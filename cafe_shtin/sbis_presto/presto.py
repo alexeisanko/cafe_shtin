@@ -248,16 +248,16 @@ class SbisUser:
                                  ".GetCustomerByParams", params, self.sid)['result']['d']
         if user_crm:
             return {
-                    "is_user":  True,
-                    'birthday': user_crm['BirthDay'],
-                    'phone': phone,
-                    'uuid': user_crm['UUID'],
-                    'name': user_crm['FirstName'],
-                }
+                "is_user": True,
+                'birthday': user_crm['BirthDay'],
+                'phone': phone,
+                'uuid': user_crm['UUID'],
+                'name': user_crm['FirstName'],
+            }
         return {
-                    "is_user":  False,
-                    'phone': phone,
-                }
+            "is_user": False,
+            'phone': phone,
+        }
 
 
 class CardUser:
@@ -270,7 +270,7 @@ class CardUser:
         self.headers = {'Content-Type': 'application/json',
                         'Cookie': 'CpsUserId=034d5129-2037-4ddb-8af8-63b894d90a5a; s3csu=daab; s3su=00a28c6f-00a2a4ae; s3tok-daab=; sid=00a28c6f-00a2a4ae-000d-1111111111111111'
                         }
-        self.card_type_uuid = "16f7b6d9-7908-443e-82f8-d22e45c31508"
+        self.card_type_uuid = settings.CARD_TYPE_UUID
 
     def verify_phone(self) -> dict:
         url = "https://sabyget.ru/discount-cards/service/?x_version=23.5104-16"
@@ -299,7 +299,7 @@ class CardUser:
                 "CardTypeUUID": self.card_type_uuid,
                 "Data": {
                     "d": [
-                        "44507f6a-b617-4c5a-a0c4-0ed4a4ad1e58",
+                        self.card_type_uuid,
                         self.phone,
                         uniq_id,
                         code_user,
@@ -307,8 +307,8 @@ class CardUser:
                             "d": [
                                 self.name,
                                 None,
-                                None,
-                                None
+                                self.birthday,
+                                self.gender
                             ],
                             "s": [
                                 {
@@ -333,8 +333,8 @@ class CardUser:
                         },
                         True,
                         True,
-                        "discount-cards.gpay.channel:6990a57a-7459-4db2-b575-0553a0e7dc31",
-                        "discount-cards.card-image.channel.d50c3c9d-1c15-4de3-85c8-552137e4f617:10658990",
+                        "discount-cards.gpay.channel:c3e0dd77-972c-4466-ac27-998a6fd3db32_10658990",
+                        "discount-cards.card-image.channel:e3c33203-4165-4d2e-a9b1-3ccf61076950_10658990",
                         None
                     ],
                     "s": [
@@ -386,3 +386,6 @@ class CardUser:
             "id": 1
         })
         response = requests.post(url, data=payload, headers=self.headers)
+        passed = response.text
+        status = response.content
+        return response.text

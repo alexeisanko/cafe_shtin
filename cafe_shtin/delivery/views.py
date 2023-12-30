@@ -107,4 +107,5 @@ class ChangeBasketAdditions(DetailView):
             }
         return JsonResponse(data)
 
+
 change_additions_in_basket = ChangeBasketAdditions.as_view()

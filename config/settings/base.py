@@ -312,9 +312,11 @@ SPECTACULAR_SETTINGS = {
 # Your stuff...
 # ------------------------------------------------------------------------------
 # SbisCRM settings
-CARD_TYPE_UUID ="16f7b6d9-7908-443e-82f8-d22e45c31508"
-CONNECT_SBIS = False
+CONNECT_SBIS = env("CONNECT_SBIS")
 
 
+CARD_TYPE_UUID = env("CARD_TYPE_UUID")
+SBISACCESSTOKEN = env("SBISACCESSTOKEN")
 
-
+SBIS_LOGIN = env("SBIS_LOGIN")
+SBIS_PASSWORD = env("SBIS_PASSWORD")
