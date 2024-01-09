@@ -70,9 +70,9 @@ class SbisPresto:
                        'name': x['name'],
                        'category_id': x['hierarchicalParent'],
                        'cost': x['cost'],
-                       'image_code': x['images'][0],
+                       'image_code': x.get('images'[0], None),
                        'description': x['description'],
-                       'weight': x['attributes']['outQuantity'],
+                       'weight': x['attributes'].get('outQuantity', None),
                        'calorie': x['attributes']['calorie'],
                        'fats': x['attributes']['fat'],
                        'protein': x['attributes']['protein'],
@@ -114,16 +114,15 @@ class SbisPresto:
                 obj, created = Product.objects.update_or_create(uuid=dish['uuid'],
                                                                 defaults={
                                                                     'name': dish['name'],
-                                                                    'category_id': Category.objects.get(
+                                                                    'category': Category.objects.get(
                                                                         id=dish['category_id']),
                                                                     'price': dish['cost'],
                                                                     'description': dish['description'],
-                                                                    # 'image': dish['image_url'],
                                                                     'calorie': dish['calorie'],
                                                                     'fats': dish['fats'],
                                                                     'protein': dish['protein'],
                                                                     'carbohydrates': dish['carbohydrates'],
-                                                                    # 'balance': dish['balance'],
+                                                                    'weight': dish['weight'],
                                                                 }
                                                                 )
                 if obj.image_code != dish['image_code']:
