@@ -38,15 +38,16 @@ class UserLoginView(LoginView):
                 data['uniq_id'] = uniq_id
                 return JsonResponse(data)
             if data['method'] == 'confirm_phone':
-                user, passed = self._confirm_phone(phone=data['phone'],
+                user, status = self._confirm_phone(phone=data['phone'],
                                                    name=data['username'],
                                                    birthday=data['birthday'],
                                                    uniq_id=data['uniq_id'],
                                                    code=data['code_user'])
-                if passed:
+                if user:
                     # user = authenticate(request, phone=user.phone, password=None)
                     login(request, user)
-                    return JsonResponse({'passed': 'passed'})
+                return JsonResponse(status)
+
         return JsonResponse(serializer.errors)
 
     @staticmethod
@@ -62,11 +63,14 @@ class UserLoginView(LoginView):
     def _confirm_phone(phone, name, birthday, uniq_id, code):
         if settings.CONNECT_SBIS:
             user = CardUser(phone=phone, name=name, birthday=birthday)
-            user, passed = user.get_or_create_user(uniq_id=uniq_id, code_user=code)
+            status = user.get_or_create_user(uniq_id=uniq_id, code_user=code)
         else:
+            status = {'status': 'passed', 'message': 'ок'}
+        if status['status'] == 'passed':
             user, created = User.objects.get_or_create(phone=phone, defaults={"username": name, 'birthday': birthday})
-            passed = True
-        return user, passed
+            return user, status
+        else:
+            return None, status
 
 
 user_login_view = UserLoginView.as_view()

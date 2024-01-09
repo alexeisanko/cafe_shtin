@@ -27,12 +27,14 @@ class Product(models.Model):
     weight = models.IntegerField(verbose_name='Вес')
     price = models.IntegerField(verbose_name='Цена')
     description = models.TextField(verbose_name='Описание')
+    calorie = models.IntegerField(verbose_name='Калории', null=True, blank=True)
     fats = models.IntegerField(verbose_name='Жиры', null=True, blank=True)
     protein = models.IntegerField(verbose_name='Белки', null=True, blank=True)
     carbohydrates = models.IntegerField(verbose_name='Углеводы', null=True, blank=True)
-    image = models.ImageField(verbose_name='Сылка на изображение', max_length=150, upload_to=f'product/')
+    image = models.ImageField(verbose_name='Изображение', max_length=150, upload_to=f'product/', default='cafe_shtin/static/images/products/null-photo-product.png/')
+    image_code = models.TextField(verbose_name='Код изображения', null=True, blank=True, default=None)
     uuid = models.CharField(verbose_name='UUID блюда', null=True, max_length=40, blank=True)
-    price_list_id = models.IntegerField(verbose_name='Идентификатор прайс-листа', blank=True, null=True)
+    available = models.BooleanField(verbose_name='Блюдо доступно', default=True)
 
     def __str__(self):
         return f'{self.name} ({self.category.name})'

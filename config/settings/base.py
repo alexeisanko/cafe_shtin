@@ -11,7 +11,7 @@ ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = ROOT_DIR / "cafe_shtin"
 env = environ.Env()
 
-READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
+READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=True)
 if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
     env.read_env(str(ROOT_DIR / ".env"))
@@ -77,6 +77,7 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "drf_spectacular",
+    "django_apscheduler",
 ]
 
 LOCAL_APPS = [
@@ -315,8 +316,10 @@ SPECTACULAR_SETTINGS = {
 CONNECT_SBIS = env("CONNECT_SBIS")
 
 
-CARD_TYPE_UUID = env("CARD_TYPE_UUID")
 SBISACCESSTOKEN = env("SBISACCESSTOKEN")
+SHOP_ID = env("SHOP_ID")
+MENU_ID = env("MENU_ID")
+CARD_TYPE_UUID = env("CARD_TYPE_UUID")
 
 SBIS_LOGIN = env("SBIS_LOGIN")
 SBIS_PASSWORD = env("SBIS_PASSWORD")

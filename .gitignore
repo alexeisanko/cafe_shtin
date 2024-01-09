@@ -68,6 +68,7 @@ celerybeat-schedule
 # Environments
 .venv
 venv/
+venv_cafe_shtin/
 ENV/
 .env
 

@@ -21,7 +21,9 @@ class SbisPresto:
         self.shops = self.__get_shops()
         self.menu = self.__get_menu()
 
-    def __get_shops(self) -> list:
+    def __get_shops(self) -> int:
+        if settings.SHOP_ID:
+            return settings.SHOP_ID
         parameters = {
             'withPhones': 'true',
             'withPrices': 'true',
@@ -30,61 +32,22 @@ class SbisPresto:
         url = 'https://api.sbis.ru/retail/point/list?'
         response = requests.get(url, params=parameters, headers=self.headers).json()
         shops = [{'id': x['id'], 'name': x['name']} for x in response['salesPoints']]
-        return shops
+        return shops[0]['id']
 
-    def __get_menu(self) -> dict:
+    def __get_menu(self) -> int:
+        if settings.MENU_ID:
+            return settings.MENU_ID
         parameters = {
-            'pointId': self.shops[0]['id'],
+            'pointId': self.shops,
             'actualDate': f'{datetime.now().strftime("%Y-%m-%d")}',
         }
         url = 'https://api.sbis.ru/retail/nomenclature/price-list?'
         response = requests.get(url, params=parameters, headers=self.headers).json()['priceLists']
         for menu in response:
-            if menu['name'] == 'Доставка':
-                return {'id': menu['id'], 'name': menu['name']}
-        logger.error(f'Не найденo нужное меню. Взято из {self.shops[0]["name"]}')
-
-    def update_catalog_site(self):
-        categories, dishes = self._get_list_dishes(shop_id=self.shops[0]['id'],
-                                                   menu_id=self.menu['id'],
-                                                   stop_dish='false',
-                                                   balance='false')
-        logger.debug('Начало сохранения фото блюд')
-        dishes = self._save_image(dishes=dishes)
-        logger.debug('Фото блюд сохранены успешно')
-        logger.debug('Актуализация категорий')
-        for category in categories:
-            obj, created = Category.objects.update_or_create(id=category['id'],
-                                                             defaults={'name': category['name']})
-        logger.debug('Актуализация блюд')
-        for dish in dishes:
-            try:
-                obj, created = Product.objects.update_or_create(id=dish['id'],
-                                                                defaults={
-                                                                    'name': dish['name'],
-                                                                    'category_id': Category.objects.get(
-                                                                        id=dish['category_id']),
-                                                                    'price': dish['cost'],
-                                                                    'description': dish['description'],
-                                                                    'image': dish['image_url'],
-                                                                    'weight': dish['attributes'][
-                                                                        'outQuantity'],
-                                                                    'uuid': dish['uuid'],
-                                                                    'price_list_id': dish['price_list_id']
-                                                                }
-                                                                )
-            except ObjectDoesNotExist:
-                logger.warning(f'Неудачная попытка добавить блюдо {dish["name"]}\n.'
-                               f'Невозможно добавить блюдо с категорией id={dish["category_id"]}\n'
-                               f'Блюдо пропущенно, преход к следующему блюду')
-            except IntegrityError:
-                logger.warning(f'Неудачная попытка добавить блюдо {dish["name"]}\n.'
-                               f'Проверьте правильность внесения блюда в сбис престо!')
-            except KeyError:
-                logger.warning(f'Неудачная попытка добавить блюдо {dish["name"]}\n.'
-                               f'В сбис престо не заполнено какое то поле (скорее всего вес)')
-            else:
-                logger.info(f'блюдо {dish["name"]} обновлено')
+            if 'доставка' in menu['name'].lower():
+                return menu['id']
+        logger.error(f'Не найденo нужное меню. Взято из {response[0]["name"]}')
+        return response[0]['id']
 
     def _get_list_dishes(self, shop_id: int, menu_id: int, stop_dish: str = 'false', balance: str = 'false'):
         parameters = {
@@ -98,54 +61,105 @@ class SbisPresto:
         categories = [{'id': x['hierarchicalId'], 'name': x['name']} for x in response['nomenclatures'] if
                       x['attributes'] is None]
         if balance == 'true':
-            dishes = [{'id': x['id'],
+            dishes = [{'uuid': x['externalId'],
                        'balance': x['balance'],
+                       'name': x['name'],
                        } for x in response['nomenclatures'] if x['attributes'] is not None]
         else:
-            dishes = [{'id': x['id'],
+            dishes = [{'uuid': x['externalId'],
                        'name': x['name'],
                        'category_id': x['hierarchicalParent'],
                        'cost': x['cost'],
-                       'image_url': x['images'],
+                       'image_code': x['images'][0],
                        'description': x['description'],
-                       'attributes': x['attributes'],
-                       'uuid': x['externalId'],
-                       'price_list_id': menu_id
+                       'weight': x['attributes']['outQuantity'],
+                       'calorie': x['attributes']['calorie'],
+                       'fats': x['attributes']['fat'],
+                       'protein': x['attributes']['protein'],
+                       'carbohydrates': x['attributes']['carbohydrate'],
+                       # 'balance': x['balance'],
                        } for x in response['nomenclatures'] if x['attributes'] is not None]
         return categories, dishes
 
-    def _save_image(self, dishes: list):
+    def _save_image(self, dish: dict, obj: Product):
+        logger.info(f'Начало сохранения фото блюда: {dish["name"]}')
         start = time.time()
         url = 'https://api.sbis.ru/retail/'
-        for dish in dishes:
-            image = requests.get(f'{url}{dish["image_url"][0]}', headers=self.headers).content
-            image_url = f"media/dishes/{dish['name']}.jpg"
+        if dish["image_code"]:
+            image = requests.get(f'{url}{dish["image_code"]}', headers=self.headers).content
+            image_url = f"media/product/{dish['name']}.jpg"
             with open(image_url, "wb") as file:
                 file.write(image)
-            dish["image_url"] = f'/{image_url}'
-        logger.debug(f'Загрузка фото блюд заняло {(time.time() - start):0.2f} сек.')
-        return dishes
+            obj.image = image_url
+            obj.image_code = dish["image_code"]
+            obj.save()
+            logger.info(f'Загрузка фото блюд заняло {(time.time() - start):0.2f} сек.')
+        else:
+            logger.warning(f'у {dish["name"]} нет изображения')
+            return
+
+    def update_catalog_site(self):
+        categories, dishes = self._get_list_dishes(shop_id=settings.SHOP_ID,
+                                                   menu_id=settings.MENU_ID,
+                                                   stop_dish='false',
+                                                   balance='false')
+
+        logger.info('Актуализация категорий')
+        for category in categories:
+            obj, created = Category.objects.update_or_create(id=category['id'],
+                                                             defaults={'name': category['name']})
+        logger.info('Актуализация блюд')
+        for dish in dishes:
+            try:
+                obj, created = Product.objects.update_or_create(uuid=dish['uuid'],
+                                                                defaults={
+                                                                    'name': dish['name'],
+                                                                    'category_id': Category.objects.get(
+                                                                        id=dish['category_id']),
+                                                                    'price': dish['cost'],
+                                                                    'description': dish['description'],
+                                                                    # 'image': dish['image_url'],
+                                                                    'calorie': dish['calorie'],
+                                                                    'fats': dish['fats'],
+                                                                    'protein': dish['protein'],
+                                                                    'carbohydrates': dish['carbohydrates'],
+                                                                    # 'balance': dish['balance'],
+                                                                }
+                                                                )
+                if obj.image_code != dish['image_code']:
+                    self._save_image(dish, obj)
+            except ObjectDoesNotExist:
+                logger.warning(f'Неудачная попытка добавить блюдо {dish["name"]}\n.'
+                               f'Невозможно добавить блюдо с категорией id={dish["category_id"]}\n'
+                               f'Блюдо пропущенно, преход к следующему блюду')
+            except IntegrityError:
+                logger.warning(f'Неудачная попытка добавить блюдо {dish["name"]}\n.'
+                               f'Проверьте правильность внесения блюда в сбис престо!')
+            except KeyError:
+                logger.warning(f'Неудачная попытка добавить блюдо {dish["name"]}\n.'
+                               f'В сбис престо не заполнено какое то поле (скорее всего вес)')
+            else:
+                logger.info(f'блюдо {dish["name"]} обновлено')
 
     def update_count_dishes_in_shop(self):
         Product.objects.all().update(available=False)
-        for shop in self.shops:
-            categories, dishes = self._get_list_dishes(shop_id=shop['id'],
-                                                       menu_id=self.menu['id'],
-                                                       stop_dish='true',
-                                                       balance='true')
-            for dish in dishes:
-                try:
-                    obj, created = Product.objects.update_or_create(
-                        dish_id=Product.objects.get(id=dish['id']),
-                        defaults={
-                            'count': dish['balance'],
-                            'available': True})
-                except ObjectDoesNotExist:
-                    logger.warning(f'Ошибка добавления количества блюд для {dish["id"]}\n'
-                                   f'Проверьте правильность shop_id={shop["id"]} и dish_id={dish["id"]}\n'
-                                   f'Возможно еще не прошла актуализация каталога блюд на сайте')
-                else:
-                    logger.info(f'Количество блюд для id = {dish["id"]} обновлено')
+        categories, dishes = self._get_list_dishes(shop_id=settings.SHOP_ID,
+                                                   menu_id=settings.MENU_ID,
+                                                   stop_dish='true',
+                                                   balance='true')
+        for dish in dishes:
+            try:
+                obj, created = Product.objects.update_or_create(
+                    dish_id=Product.objects.get(uuid=dish['uuid']),
+                    defaults={
+                        'count': dish['balance'],
+                        'available': True})
+            except ObjectDoesNotExist:
+                logger.warning(f'Ошибка добавления количества блюд для {dish["name"]}\n'
+                               f'Проверьте баланс в сбис престо у {dish["name"]}\n'
+                               f'Возможно еще не прошла актуализация каталога блюд на сайте')
+            else:
+                logger.info(f'Количество блюд для id = {dish["name"]} обновлено')
 
 
 class SbisOrder:
@@ -386,6 +400,10 @@ class CardUser:
             "id": 1
         })
         response = requests.post(url, data=payload, headers=self.headers)
-        passed = response.text
-        status = response.content
-        return response.text
+        if response.json().get('error', False):
+            return {'status': 'passed', 'message': response.json()['error']['message']}
+        elif response.json().get('result', False):
+            return {'status': 'passed', 'message': 'ок'}
+        else:
+            return {'status': 'error', 'message': 'Внутрення ошибка сервера'}
+

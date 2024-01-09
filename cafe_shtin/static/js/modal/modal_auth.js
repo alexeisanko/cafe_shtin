@@ -26,7 +26,7 @@ $(document).ready(function () {
                         $('.birthday-user').attr('type', 'date')
                         $('.name-user').attr('type', 'text')
                         $('.form__title:first').text('Вы в первый раз?')
-                        $('.extra_field').css('display', 'ruby')
+                        $('.extra_field').css('display', 'flex')
                         $form.attr('id', 'form_get_code')
                         break
                     case true:
@@ -51,13 +51,14 @@ $(document).ready(function () {
             dataType: 'json',
             data: data,
             success: function (data) {
-                console.log(data)
-                if (sessionStorage.getItem('is_open_order') === 'True') {
-                    location.reload()
-                } else {
-                    location.replace("http://127.0.0.1:8000/users/profile/")
+                if (data['status'] === 'passed') {
+                    console.log(data)
+                    if (sessionStorage.getItem('is_open_order') === 'True') {
+                        location.reload()
+                    } else {
+                        location.replace("http://127.0.0.1:8000/users/profile/")
+                    }
                 }
-
             }
         })
         return false
