@@ -348,3 +348,36 @@ html {
   transform: translate3d(22px, 2px, 0);
 }
 /* Конец стилей для base.html (header, footer) */
+
+
+.place {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: 20px;
+}
+
+.place img {
+    margin-right: 10px;
+    width: 9%;
+}
+
+.place__name {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 21px;
+    color: #fff;
+}
+
+.place__address {
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 16px;
+    color: #fff;
+}
+
+@media screen and (max-width: 800px) {
+  .place {
+    display: none;
+  }
+}

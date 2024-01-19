@@ -38,10 +38,17 @@
       <div class="contacts menu__contacts">
         <a href="{% url 'delivery:home' %}" class="img contacts__img link"><img
           src={% static '/images/menu/logo.png' %} alt="logo"></a>
-        <div class="contacts__info info">
-          <a href="tel:89992552525" class="info__phone link">8 999 255 25 25</a>
-          <a href="mailto:example@example.com" class="info__mail link">example@example.com</a>
+        <div class="place header__place">
+          <img src="{% static 'images/menu/place.svg' %}" alt="place">
+          <div class="place__info">
+            <p class="place__name">Чистый берег</p>
+            <span class="place__address">ул. Чистопрудненская, 29</span>
+          </div>
         </div>
+{#        <div class="contacts__info info">#}
+{#          <a href="tel:89992552525" class="info__phone link">8 999 255 25 25</a>#}
+{#          <a href="mailto:example@example.com" class="info__mail link">example@example.com</a>#}
+{#        </div>#}
       </div>
       <div class="right">
         <div class="nav">
@@ -123,44 +130,44 @@
 
 {% if user.is_authenticated %}
 {% else %}
-<div class="modal modal-login micromodal-slide " id="modal_authentication" aria-hidden="true">
-  <div class="modal__overlay" tabindex="-1" data-micromodal-close>
-    <div>
-      <main id="modal-1-content">
-        <div class="login__block">
-          <p>
-            <img class="close" data-micromodal-close src="{% static 'images/modal_login/close.svg' %}" alt="x"
-                 class="login__close">
-          </p>
-          <form action="#" class="form" method="post" id="form_login">
-            <h2 class="form__title">Авторизация</h2>
-            <input required class="input form__input phone-user" type="tel" placeholder="Введите номер телефона"
-                   name="phone">
-            <input required class="input form__input code-user" type="hidden" placeholder="Введите код"
-                   name="code_user">
-            <div class="extra_field form__title" style="display: none">
-              <div style="display: grid">
-                <span> Ваше имя</span>
-                <input required class="input__extra form__input name-user" type="hidden" name="username" value="">
+  <div class="modal modal-login micromodal-slide " id="modal_authentication" aria-hidden="true">
+    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+      <div>
+        <main id="modal-1-content">
+          <div class="login__block">
+            <p>
+              <img class="close" data-micromodal-close src="{% static 'images/modal_login/close.svg' %}" alt="x"
+                   class="login__close">
+            </p>
+            <form action="#" class="form" method="post" id="form_login">
+              <h2 class="form__title">Авторизация</h2>
+              <input required class="input form__input phone-user" type="tel" placeholder="Введите номер телефона"
+                     name="phone">
+              <input required class="input form__input code-user" type="hidden" placeholder="Введите код"
+                     name="code_user">
+              <div class="extra_field form__title" style="display: none">
+                <div style="display: grid">
+                  <span> Ваше имя</span>
+                  <input required class="input__extra form__input name-user" type="hidden" name="username" value="">
+                </div>
+                <div style="display: grid">
+                  <span> День рождения</span>
+                  <input required class="input__extra form__input birthday-user" type="hidden" name="birthday" value="">
+                </div>
               </div>
-              <div style="display: grid">
-                <span> День рождения</span>
-                <input required class="input__extra form__input birthday-user" type="hidden" name="birthday" value="">
-              </div>
-            </div>
-            {% csrf_token %}
-            <input required class="uniq-id" type="hidden" name="uniq_id" value="">
-            <span id="reverse_timer" style="display: none; color: white">Повторить звонок через 1:30</span>
-            <input required class="form__input form__btn button button--primary" type="submit" value="Войти"
-                   id="send_form_login">
-          </form>
-        </div>
+              {% csrf_token %}
+              <input required class="uniq-id" type="hidden" name="uniq_id" value="">
+              <span id="reverse_timer" style="display: none; color: white">Повторить звонок через 1:30</span>
+              <input required class="form__input form__btn button button--primary" type="submit" value="Войти"
+                     id="send_form_login">
+            </form>
+          </div>
 
-      </main>
-      <footer></footer>
+        </main>
+        <footer></footer>
+      </div>
     </div>
   </div>
-</div>
 {% endif %}
 {% block inline_javascript %}{% endblock inline_javascript %}
 </body>
