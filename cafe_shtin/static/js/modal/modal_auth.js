@@ -14,7 +14,7 @@ $(document).ready(function () {
 
     $(document).on("submit", "#form_login", function (event) {
         let $form = $(this);
-        let url = "http://127.0.0.1:8000/users/check_user/"
+        let url = "/users/check_user/"
         $.ajax({
             type: 'GET',
             url: url,
@@ -41,10 +41,10 @@ $(document).ready(function () {
         return false
     })
 
-    $(document).on("submit", "#form_confirm_login", function (event) {
+    $(document).on("submit", "#form_confirm_login", function  (event) {
         let $form = $(this);
         let data = $form.serialize() + '&method=confirm_phone'
-        let url = "http://127.0.0.1:8000/users/confirm_login/"
+        let url = "/users/confirm_login/"
         $.ajax({
             type: 'POST',
             url: url,
@@ -71,22 +71,53 @@ $(document).ready(function () {
     })
 
     function GetConfirmCode($form) {
-        let url = "http://127.0.0.1:8000/users/confirm_login/"
-        let data = $form.serialize() + '&method=get_code'
+        let url = "/users/confirm_login/"
+        let data_post = $form.serialize() + '&method=get_code'
         $.ajax({
             type: 'POST',
             url: url,
             dataType: 'json',
-            data: data,
+            data: data_post,
             success: function (data) {
                 console.log(data)
                 $form.attr('id', 'form_confirm_login')
-                $('.form__title:first').text('Введите код из смс')
+                $('.form__title:first').text('Введите код SMS или последние 4 цифры звонка')
+
+                $('#reverse_timer').css('display', 'flex')
+                startTimer(90, document.querySelector('#reverse_timer'), $form)
                 $('.code-user').attr('type', 'text')
                 $('.uniq-id').val(data.uniq_id)
             }
         })
     }
+
+    function startTimer(duration, display, $form) {
+        let timer = duration, minutes, seconds;
+        setInterval(function () {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+            display.textContent = "Повторить звонок через " + minutes + ":" + seconds;
+
+            if (--timer < 0) {
+                display.textContent = "Повторить звонок";
+                $('#reverse_timer').addClass('repeat_call')
+
+            }
+
+        }, 1000);
+
+        $(document).on("click", ".repeat_call", function (event) {
+            $(this).removeClass('repeat_call')
+            GetConfirmCode($form)
+        })
+    }
+
 })
+
+
+
 
 

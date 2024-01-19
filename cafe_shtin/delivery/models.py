@@ -4,6 +4,7 @@ from django.db import models
 class Category(models.Model):
     """Свойства определенной категории блюд"""
     name = models.CharField(max_length=30, verbose_name='Категория блюда', unique=True)
+    sbis_id = models.IntegerField(verbose_name='Идентификатор в СБИС престо')
 
     def __str__(self):
         return f'{self.name}'
@@ -23,17 +24,17 @@ class Product(models.Model):
         on_delete=models.PROTECT,
         verbose_name='Категория',
     )
-    count = models.IntegerField(verbose_name='Доступное количество', default=0)
+    balance = models.IntegerField(verbose_name='Доступное количество', default=0)
     weight = models.IntegerField(verbose_name='Вес')
     price = models.IntegerField(verbose_name='Цена')
-    description = models.TextField(verbose_name='Описание')
+    description = models.TextField(verbose_name='Описание', blank=True)
     calorie = models.IntegerField(verbose_name='Калории', null=True, blank=True)
     fats = models.IntegerField(verbose_name='Жиры', null=True, blank=True)
     protein = models.IntegerField(verbose_name='Белки', null=True, blank=True)
     carbohydrates = models.IntegerField(verbose_name='Углеводы', null=True, blank=True)
-    image = models.ImageField(verbose_name='Изображение', max_length=150, upload_to=f'product/', default='cafe_shtin/static/images/products/null-photo-product.png/')
-    image_code = models.TextField(verbose_name='Код изображения', null=True, blank=True, default=None)
-    uuid = models.CharField(verbose_name='UUID блюда', null=True, max_length=40, blank=True)
+    image = models.ImageField(verbose_name='Изображение', upload_to=f'product/', default='product/null-photo-product.png/')
+    image_code = models.TextField(verbose_name='Код изображения', null=True)
+    uuid = models.UUIDField(verbose_name='UUID блюда', unique=True)
     available = models.BooleanField(verbose_name='Блюдо доступно', default=True)
 
     def __str__(self):
@@ -45,9 +46,10 @@ class Product(models.Model):
 
 
 class Addition(models.Model):
-    name = models.CharField(max_length=25, verbose_name='Название допника')
+    name = models.CharField(max_length=25, verbose_name='Название дополнения к блюду')
     price = models.IntegerField(verbose_name='Цена')
-    image = models.ImageField(verbose_name='Изображение', max_length=150)
+    image = models.ImageField(verbose_name='Изображение', max_length=150, upload_to=f'addition/', default='cafe_shtin/static/images/products/null-photo-product.png/')
+    uuid = models.UUIDField(verbose_name='UUID дополнения к блюду', unique=True)
 
     def __str__(self):
         return f'{self.name}'

@@ -1,10 +1,9 @@
 from typing import Any, Dict
-import json
 
 from django.views.generic import TemplateView, DetailView
 from django.http import HttpRequest, JsonResponse
 
-from cafe_shtin.delivery.utilities import get_actual_menu, is_open
+from cafe_shtin.utils.catalog_shop import get_actual_menu, is_open
 from cafe_shtin.delivery.models import Product, Addition
 from cafe_shtin.delivery.cart import Cart
 
@@ -14,7 +13,7 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        menu = get_actual_menu(min_count=10)
+        menu = get_actual_menu(min_balance=0)
         context['menu'] = menu
         context['is_open']: bool = is_open()
         return context
@@ -66,6 +65,7 @@ class ChangeBasket(DetailView):
                 'total_price_product': cart.cart[product_id]['total'],
                 'total_count_product': cart.get_total_count_products(),
                 'total_price_order': cart.get_total_price(),
+                'total_price_with_cashback': cart.get_total_price_with_cashback(),
                 'total_cashback': cart.get_received_cashback()
             }
         else:

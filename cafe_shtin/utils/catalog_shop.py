@@ -2,12 +2,12 @@ from datetime import datetime
 from cafe_shtin.delivery.models import Category, Product
 
 
-def get_actual_menu(min_count=0) -> dict:
+def get_actual_menu(min_balance=0) -> dict:
     menu = {}
     categories = Category.objects.all()
     breakfast = is_breakfast_time()
     for category in categories:
-        products = Product.objects.filter(category=category).filter(count__gte=min_count)
+        products = Product.objects.filter(category=category).filter(balance__gte=min_balance)
         if not products:
             continue
         if category.name != 'Завтраки' or (category.name == 'Завтраки' and breakfast):

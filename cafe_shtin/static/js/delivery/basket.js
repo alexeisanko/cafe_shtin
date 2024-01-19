@@ -1,25 +1,25 @@
 $(document).ready(function () {
 
     // Change product in basket
-    $('.item__count .count .count__plus').click(function () {
+    $('.item__count .balance .count__plus').click(function () {
         let $product = $(this).parent('div').parent('div').parent('div').parent('div').parent('div')
         UpdateBasketProduct($product, quantity = 1)
     });
 
-    $('.item__count .count .count__minus').click(function () {
+    $('.item__count .balance .count__minus').click(function () {
         let $product = $(this).parent('div').parent('div').parent('div').parent('div').parent('div')
         UpdateBasketProduct($product, quantity = -1)
     });
 
     $('.item__del').click(function () {
         let $product = $(this).parent('div')
-        let text = $product.children('.order__info').children('.order__cost').children('.item__count').children('.count').children('.count__text').text()
+        let text = $product.children('.order__info').children('.order__cost').children('.item__count').children('.balance').children('.count__text').text()
         let quantity = parseInt(text.match(/\d+/))
         UpdateBasketProduct($product, quantity = -quantity)
     });
 
     function UpdateProductMedia($product, data) {
-        $product.children('.order__info').children('.order__cost').children('.item__count').children('.count').children('.count__text').text(`${data.quantity} шт`)
+        $product.children('.order__info').children('.order__cost').children('.item__count').children('.balance').children('.count__text').text(`${data.quantity} шт`)
         $product.children('.order__info').children('.order__cost').children('.item__count').children('.item__endcost').text(`${data.total_price_product} ₽`)
         if (data.quantity == 0) {
             $product.css('display', 'none');
@@ -33,7 +33,8 @@ $(document).ready(function () {
             $('.basket__media').css('display', 'flex')
         }
         $('.basket__price').text(`${data.total_price_order} ₽`);
-        $('.summary__price').text(data.total_price_order)
+        $('.without-cashback').text(data.total_price_order)
+        $('.with-cashback').text(data.total_price_with_cashback)
         $('.basket__media').text(data.total_count_product)
         $('.cashback__num').text(data.total_cashback)
     }
@@ -87,11 +88,11 @@ $(document).ready(function () {
     function UpdateAdditionMedia($addition, data) {
         if (data.quantity === 0) {
             $addition.children('.more__btn').css('display', 'flex');
-            $addition.children('.count').css('display', 'none');
+            $addition.children('.balance').css('display', 'none');
         } else {
             $addition.children('.more__btn').css('display', 'none');
-            $addition.children('.count').css('display', 'flex');
-            $addition.children('.count').children('.count__text').text(`${data.quantity} шт`)
+            $addition.children('.balance').css('display', 'flex');
+            $addition.children('.balance').children('.count__text').text(`${data.quantity} шт`)
         }
     }
 
@@ -121,4 +122,19 @@ $(document).ready(function () {
             }
         });
     }
+
+    $('.use-cashback i').click(function () {
+        if ($('.use-cashback').hasClass('active')) {
+            $('.use-cashback').removeClass('active')
+            $('.without-cashback').css('display', 'flex')
+            $('.with-cashback').css('display', 'none')
+        } else {
+            $('.use-cashback').addClass('active')
+            $('.without-cashback').css('display', 'none')
+            $('.with-cashback').css('display', 'flex')
+
+        }
+
+    })
+
 })

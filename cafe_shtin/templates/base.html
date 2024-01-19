@@ -150,6 +150,7 @@
             </div>
             {% csrf_token %}
             <input required class="uniq-id" type="hidden" name="uniq_id" value="">
+            <span id="reverse_timer" style="display: none; color: white">Повторить звонок через 1:30</span>
             <input required class="form__input form__btn button button--primary" type="submit" value="Войти"
                    id="send_form_login">
           </form>

@@ -12,6 +12,7 @@ class Cart:
             cart_additions = self.session['cart_additions'] = {}
         self.cart = cart
         self.cart_additions = cart_additions
+        self.user = request.user
 
     def change(self, product: Product, quantity=1):
         product_id = str(product.id)
@@ -104,3 +105,10 @@ class Cart:
 
     def get_total_count_products(self):
         return sum(item['quantity'] for item in self.cart.values())
+
+    def get_total_price_with_cashback(self):
+        total = self.get_total_price()
+        max_sale = int(total * 0.3)
+        cashback = self.user.cashback if self.user.id else 0
+        current_sale = cashback if cashback < max_sale else max_sale
+        return total - current_sale

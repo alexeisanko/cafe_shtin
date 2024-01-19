@@ -14,5 +14,9 @@ def update_menu():
 
 @celery_app.task()
 def update_balance():
+    logging.info('Начало обновления баланса')
     presto = SbisPresto()
     return presto.update_count_dishes_in_shop()
+    logging.info('Обновление баланса завершено')
+
+

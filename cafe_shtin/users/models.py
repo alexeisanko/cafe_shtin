@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.auth.hashers import make_password
 from django.db import models
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 
 
 class MyUserManage(UserManager):
@@ -34,11 +33,12 @@ class User(AbstractUser):
     """
 
     #: First and last name do not cover name patterns around the globe
-    phone = models.CharField(_("Номер телефона"), max_length=255, unique=True)
-    username = models.CharField(_('username'), max_length=150)
-    password = models.CharField(_('password'), max_length=128, null=True)
-    cashback = models.IntegerField(_("Накопленный кешбек"), blank=True, default=0)
-    birthday = models.DateField(_("День рождения"), null=True)
+    phone = models.CharField(verbose_name="Номер телефона", max_length=255, unique=True)
+    uuid = models.UUIDField(verbose_name='Идентификатор в СБИС престо', unique=True, null=True)
+    username = models.CharField(verbose_name='Имя пользователя', max_length=50)
+    password = models.CharField(verbose_name='Пароль', max_length=128, null=True)
+    cashback = models.IntegerField(verbose_name="Накопленный кешбек", blank=True, default=0)
+    birthday = models.DateField(verbose_name="День рождения", null=True)
     first_name = None  # type: ignore
     last_name = None  # type: ignore
     email = None  # type: ignore

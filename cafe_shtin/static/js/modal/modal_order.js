@@ -5,7 +5,7 @@ $(document).ready(function () {
     })
 
 
-    $('.form-switch i').click(function (){
+    $('.type-delivery i').click(function (){
         if ($('#select-type-delivery').text() === 'Доставка') {
             $('#select-type-delivery').text('Самовывоз')
             $('.address__title').text('Адрес самовывоза')

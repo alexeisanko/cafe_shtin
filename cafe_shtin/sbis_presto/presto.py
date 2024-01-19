@@ -69,7 +69,7 @@ class SbisPresto:
             dishes = [{'uuid': x['externalId'],
                        'name': x['name'],
                        'category_id': x['hierarchicalParent'],
-                       'cost': x['cost'],
+                       'price': x['cost'],
                        'image_code': x.get('images'[0], None),
                        'description': x['description'],
                        'weight': x['attributes'].get('outQuantity', None),
@@ -106,17 +106,23 @@ class SbisPresto:
 
         logger.info('Актуализация категорий')
         for category in categories:
-            obj, created = Category.objects.update_or_create(id=category['id'],
+            obj, created = Category.objects.update_or_create(sbis_id=category['id'],
                                                              defaults={'name': category['name']})
         logger.info('Актуализация блюд')
         for dish in dishes:
+            if dish['weight'] is None:
+                dish['weight'] = 100
+                logger.warning(f'В СБИС Нет веса блюда {dish["name"]}')
+            if dish['description'] is None:
+                dish['description'] = ''
+                logger.warning(f'В СБИС Нет описания блюда {dish["name"]}')
             try:
                 obj, created = Product.objects.update_or_create(uuid=dish['uuid'],
                                                                 defaults={
                                                                     'name': dish['name'],
                                                                     'category': Category.objects.get(
-                                                                        id=dish['category_id']),
-                                                                    'price': dish['cost'],
+                                                                        sbis_id=dish['category_id']),
+                                                                    'price': dish['price'],
                                                                     'description': dish['description'],
                                                                     'calorie': dish['calorie'],
                                                                     'fats': dish['fats'],
@@ -131,9 +137,10 @@ class SbisPresto:
                 logger.warning(f'Неудачная попытка добавить блюдо {dish["name"]}\n.'
                                f'Невозможно добавить блюдо с категорией id={dish["category_id"]}\n'
                                f'Блюдо пропущенно, преход к следующему блюду')
-            except IntegrityError:
-                logger.warning(f'Неудачная попытка добавить блюдо {dish["name"]}\n.'
+            except IntegrityError as e:
+                logger.warning(f'Неудачная попытка добавить блюдо {dish["name"]}.\n'
                                f'Проверьте правильность внесения блюда в сбис престо!')
+                logger.warning(e)
             except KeyError:
                 logger.warning(f'Неудачная попытка добавить блюдо {dish["name"]}\n.'
                                f'В сбис престо не заполнено какое то поле (скорее всего вес)')
@@ -148,17 +155,21 @@ class SbisPresto:
                                                    balance='true')
         for dish in dishes:
             try:
-                obj, created = Product.objects.update_or_create(
-                    dish_id=Product.objects.get(uuid=dish['uuid']),
-                    defaults={
-                        'count': dish['balance'],
-                        'available': True})
+                Product.objects.filter(uuid=dish['uuid']).update(balance=dish['balance'], available=True)
             except ObjectDoesNotExist:
                 logger.warning(f'Ошибка добавления количества блюд для {dish["name"]}\n'
                                f'Проверьте баланс в сбис престо у {dish["name"]}\n'
                                f'Возможно еще не прошла актуализация каталога блюд на сайте')
             else:
                 logger.info(f'Количество блюд для id = {dish["name"]} обновлено')
+
+    def get_balance_cashback(self, user_uuid: str):
+        url = f'https://api.sbis.ru/retail/customer/{user_uuid}/bonus-balance'
+        parameters = {
+            'pointId': self.shops
+        }
+        response = requests.get(url, params=parameters, headers=self.headers).json()
+        return response['bonusBalance'] if response['bonusBalance'] is not None else 0
 
 
 class SbisOrder:
@@ -265,7 +276,7 @@ class SbisUser:
                 'birthday': user_crm['BirthDay'],
                 'phone': phone,
                 'uuid': user_crm['UUID'],
-                'name': user_crm['FirstName'],
+                'username': f"{user_crm['LastName'] if user_crm['LastName'] else ''} {user_crm['FirstName'] if user_crm['FirstName'] else ''} {user_crm['SecondName'] if user_crm['SecondName'] else ''}",
             }
         return {
             "is_user": False,
@@ -406,3 +417,7 @@ class CardUser:
         else:
             return {'status': 'error', 'message': 'Внутрення ошибка сервера'}
 
+
+if __name__ == '__main__':
+    presto = SbisPresto()
+    presto.update_catalog_site()
