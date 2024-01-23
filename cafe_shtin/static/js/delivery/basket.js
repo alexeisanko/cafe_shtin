@@ -45,7 +45,7 @@ $(document).ready(function () {
     }
 
     function GetProductURL(product_id, quantity) {
-        let url = new URL('http://127.0.0.1:8000/change_basket/');
+        let url = new URL('change_basket', document.location.origin);
         url.searchParams.set('product_id', product_id)
         url.searchParams.set('quantity', quantity)
         return url
@@ -102,7 +102,7 @@ $(document).ready(function () {
     }
 
     function GetAdditionURL(addition_id, quantity) {
-        let url = new URL('http://127.0.0.1:8000/change_additions_in_basket/');
+        let url = new URL('change_additions_in_basket', document.location.origin);
         url.searchParams.set('addition_id', addition_id)
         url.searchParams.set('quantity', quantity)
         return url

@@ -6,7 +6,7 @@ $('.modal_detail_product').click(function () {
 })
 
 async function UpdateInfoProduct (product_id){
-    let url = new URL('http://127.0.0.1:8000/get_info_product/');
+    let url = new URL('get_info_product', document.location.origin);
     url.searchParams.set('product_id', product_id)
     let response = await fetch(url);
     let data = await response.json(); // читаем ответ в формате JSON

@@ -59,11 +59,6 @@ class UserLoginView(LoginView):
 
     @staticmethod
     def _get_uniq_code(phone, name, birthday):
-        is_good_phone = normalization_phone(phone=phone)
-        if is_good_phone['passed']:
-            phone = is_good_phone['phone']
-        else:
-            return JsonResponse({'error': is_good_phone['error']})
         if settings.CONNECT_SBIS:
             user = CardUser(phone=phone, name=name, birthday=birthday)
             uniq_id = user.verify_phone()
@@ -73,11 +68,6 @@ class UserLoginView(LoginView):
 
     @staticmethod
     def _confirm_phone(phone, name, birthday, uniq_id, code):
-        is_good_phone = normalization_phone(phone=phone)
-        if is_good_phone['passed']:
-            phone = is_good_phone['phone']
-        else:
-            return JsonResponse({'error': is_good_phone['error']})
         if settings.CONNECT_SBIS:
             user = CardUser(phone=phone, name=name, birthday=birthday)
             status = user.get_or_create_user(uniq_id=uniq_id, code_user=code)

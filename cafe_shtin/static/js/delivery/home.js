@@ -98,7 +98,7 @@ $(document).ready(function () {
     }
 
     function GetURL(product_id, quantity) {
-        let url = new URL('http://127.0.0.1:8000/change_basket/');
+        let url = new URL('change_basket/', document.location.origin);
         url.searchParams.set('product_id', product_id)
         url.searchParams.set('quantity', quantity)
         return url
