@@ -9,9 +9,9 @@
 {% endblock css %}
 
 {% block javascript %}
-  <script src="https://api-maps.yandex.ru/2.1.oldie.1/?lang=ru_RU&amp;apikey=12586041-0718-4b66-98eb-c9fa12a5220b" type="text/javascript"></script>
-{#  После деплоя поставить версию 2.1#}
-{#  <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey=265fda5e-4f09-49c8-a141-205b2776d1fa" type="text/javascript"></script>#}
+  <script src="https://api-maps.yandex.ru/2.1/?apikey=265fda5e-4f09-49c8-a141-205b2776d1fa&lang=ru_RU"
+          type="text/javascript">
+  </script>
   <script src="{% static 'js/delivery/api-yandex.js' %}"></script>
   <script defer src="{% static 'js/owl.carousel.min.js' %}"></script>
   <script defer src="{% static 'js/carousel.js' %}"></script>
@@ -28,7 +28,7 @@
         <div class="summary">
           <div class="summary__info border-line">
             <div class="cashback summary__item">
-              <span class="cashback__title summary__title">Начислим кэшбэк</span>
+              <span class="cashback__title summary__title">Начислим кешбэк</span>
               <span class="cashback__num summary__num">{{ cart.get_received_cashback }} ₽ </span>
             </div>
             <div class="delivery summary__item">
@@ -65,7 +65,7 @@
           {% endif %}
 
         </div>
-        <div>
+        <div class="basket__content">
           {% if not cart.cart.items %}
             <h2 class="order__title">Корзина пуста</h2>
           {% else %}
@@ -100,7 +100,7 @@
             {% endfor %}
           {% endif %}
         </div>
-      </div>
+     </div>
     </div>
     {% if cart.cart_additions.items %}
       <div class="more">

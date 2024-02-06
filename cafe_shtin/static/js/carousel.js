@@ -1,3 +1,18 @@
+// window.onscroll = (function() {
+//     var lastScrollTop = 0;
+//     return function() {
+//             var st = window.scrollY || document.documentElement.scrollTop;
+//             if (st > lastScrollTop) { // скролл вниз
+//                 document.querySelector('header').style.background = '#646464';
+//             } else if (st < lastScrollTop) { // скролл вверх
+//                 if (document.querySelector('header').getBoundingClientRect().top == document.querySelector('body').getBoundingClientRect().top) {
+//                     document.querySelector('header').style.background = '#fff';
+//                 }
+//             }
+//             lastScrollTop = st;
+//         }
+// })();
+
 $('#carousel-additions').owlCarousel({
     center: false,
     mouseDrag: true,
