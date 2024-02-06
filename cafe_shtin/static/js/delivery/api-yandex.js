@@ -6,17 +6,17 @@ function init() {
 
 $(document).ready(function () {
 
-    $('#suggest-address').change( async function () {
-        let myGeocoder = ymaps.geocode($(this).val(),
-            // {
-            //     boundedBy: myMap.getBounds(),
-            //     strictBounds: true
-            // }
-        );
-        let is_good_address = await DefineAddress(myGeocoder)
-        console.log(is_good_address)
-
-    })
+    // $('#suggest-address').change( async function () {
+    //     let myGeocoder = ymaps.geocode($(this).val(),
+    //         // {
+    //         //     boundedBy: myMap.getBounds(),
+    //         //     strictBounds: true
+    //         // }
+    //     );
+    //     let is_good_address = await DefineAddress(myGeocoder)
+    //     console.log(is_good_address)
+    //
+    // })
 
     function DefineAddress(myGeocoder) {
         return myGeocoder.then(function (res) {

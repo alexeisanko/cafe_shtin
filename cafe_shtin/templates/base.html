@@ -24,7 +24,7 @@
   <!-- Javascript
   ================================================== -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js"></script>
+  <script src="https://unpkg.com/imask"></script>
   <script defer src="{% static 'js/base.js' %}"></script>
   <script defer src="{% static 'js/modal/modal_base.js' %}"></script>
   <script defer src="{% static 'js/modal/modal_auth.js' %}"></script>
@@ -139,9 +139,9 @@
               <img class="close" data-micromodal-close src="{% static 'images/modal_login/close.svg' %}" alt="x"
                    class="login__close">
             </p>
-            <form action="#" class="form" method="post" id="form_login">
+            <form action="{% url 'users:check_user' %}" class="form" method="post" id="form_login">
               <h2 class="form__title">Авторизация</h2>
-              <input required class="input form__input phone-user" type="tel" placeholder="Введите номер телефона"
+              <input required class="input form__input phone-user" id="phone-user" type="tel" placeholder="Введите номер телефона"
                      name="phone">
               <input required class="input form__input code-user" type="hidden" placeholder="Введите код"
                      name="code_user">

@@ -173,10 +173,11 @@ class SbisPresto:
 
 
 class SbisOrder:
-    def __init__(self, shop_id, user, nomenclatures, address, payment, is_pickup):
-        self.headers = {"X-SBISAccessToken": settings.SBISACCESSTOKEN,
-                        'Content-Type': 'application/json'}
-        self.shop_id = shop_id
+    headers = {"X-SBISAccessToken": settings.SBISACCESSTOKEN,
+               'Content-Type': 'application/json'}
+
+    def __init__(self, user, nomenclatures, address, payment, is_pickup):
+        self.shop_id = settings.SHOP_ID
         self.user = user
         self.nomenclatures = nomenclatures
         self.address = address
@@ -212,8 +213,52 @@ class SbisOrder:
     def _get_orders_user(self):
         pass
 
-    def get_address(self):
-        pass
+    @classmethod
+    def normalized_address(cls, address):
+        normalized_address = cls._check_correct_address(address)
+        if not normalized_address['status']:
+            return {'status': False,
+                    'data': None,
+                    'error': normalized_address['error']}
+        check_zone = cls._check_delivery_zone(normalized_address['address_json'])
+        if check_zone:
+            return {'status': True,
+                    'data': {
+                        'address_full': normalized_address['address_full'],
+                        'address_json': normalized_address['address_json']
+                    },
+                    'error': None}
+        else:
+            return {'status': False,
+                    'data': None,
+                    'error': ['Некорректная зона доставки']}
+
+    @classmethod
+    def _check_correct_address(cls, address):
+        url = f'https://api.sbis.ru/retail/delivery/suggested-address'
+        parameters = {
+            'enteredAddress': address
+        }
+        response = requests.get(url, params=parameters, headers=cls.headers).json()
+        address_full, address_json = response['addresses'][0]['addressFull'], response['addresses'][0]['addressJSON']
+        if address_json['HouseNum']:
+            return {'status': True, 'address_full': address_full, 'address_json': address_json, 'error': None}
+        else:
+            return {'status': False, 'address_full': address_full, 'address_json': address_json,
+                    'error': ['Некорректный адрес доставки']}
+
+    @classmethod
+    def _check_delivery_zone(cls, address):
+        url = f'hhttps://api.sbis.ru/retail/delivery/cost'
+        parameters = {
+            'pointId': settings.SHOP_ID,
+            'address': address
+        }
+        response = requests.get(url, params=parameters, headers=cls.headers).json()
+        if response['district']:
+            return True
+        else:
+            return False
 
 
 class SbisUser:

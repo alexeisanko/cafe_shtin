@@ -1,4 +1,5 @@
 from typing import Any, Dict
+import json
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -29,7 +30,8 @@ profile_user_view = ProfileUserView.as_view()
 class UserLoginView(LoginView):
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
-        serializer = LoginSerializer(data=request.POST)
+        request_data = json.loads(request.body)
+        serializer = LoginSerializer(data=request_data)
         if serializer.is_valid():
             data = serializer.data
             is_good_phone = normalization_phone(phone=data['phone'])

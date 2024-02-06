@@ -43,7 +43,8 @@ class DetailProductView(DetailView):
         data = {'image': product.image.url,
                 'name': product.name,
                 'cost': product.price,
-                'description': product.description
+                'description': product.description,
+                'id': product.id
                 }
         return JsonResponse(data)
 

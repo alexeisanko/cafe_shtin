@@ -7,7 +7,9 @@ user_logout_view
 )
 
 from cafe_shtin.users.api.views import (
-    CheckUser
+    CheckUser,
+    GetCode
+
 )
 
 app_name = "users"
@@ -20,4 +22,6 @@ urlpatterns = [
 # API URLS
 urlpatterns += [
     path("check_user/", view=CheckUser.as_view(), name="check_user"),
+    path("get_code/", view=GetCode.as_view(), name="get_code"),
+
 ]
