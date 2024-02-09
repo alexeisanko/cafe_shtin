@@ -3,12 +3,12 @@ from django.urls import path
 from cafe_shtin.users.views import (
     profile_user_view,
     user_login_view,
-user_logout_view
+    user_logout_view
 )
 
 from cafe_shtin.users.api.views import (
     CheckUser,
-    GetCode
+    SendCodeToPhone
 
 )
 
@@ -22,6 +22,6 @@ urlpatterns = [
 # API URLS
 urlpatterns += [
     path("check_user/", view=CheckUser.as_view(), name="check_user"),
-    path("get_code/", view=GetCode.as_view(), name="get_code"),
+    path("get_code/", view=SendCodeToPhone.as_view(), name="get_code"),
 
 ]

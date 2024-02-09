@@ -36,22 +36,6 @@ class AboutView(TemplateView):
 about_view = AboutView.as_view()
 
 
-class DetailProductView(DetailView):
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
-        product_id = request.GET['product_id']
-        product: Product = Product.objects.get(id=product_id)
-        data = {'image': product.image.url,
-                'name': product.name,
-                'cost': product.price,
-                'description': product.description,
-                'id': product.id
-                }
-        return JsonResponse(data)
-
-
-detail_product_view = DetailProductView.as_view()
-
-
 class ChangeBasket(DetailView):
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:

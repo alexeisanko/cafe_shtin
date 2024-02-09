@@ -376,7 +376,7 @@ class CardUser:
                             "d": [
                                 self.name,
                                 None,
-                                self.birthday,
+                                datetime.strftime(self.birthday, '%Y-%m-%d'),
                                 self.gender
                             ],
                             "s": [

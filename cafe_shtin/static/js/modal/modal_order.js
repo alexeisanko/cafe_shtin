@@ -1,23 +1,17 @@
-$(document).ready(function () {
+window.addEventListener("load", function () {
 
-    $('.modal_order').click(function () {
+    const modal_order = document.querySelector(".modal_order");
+    const select_type_delivery = document.querySelector(".type-delivery i");
+
+    modal_order.addEventListener("click", function () {
         MicroModal.show('modal_order');
     })
 
-
-    $('.type-delivery i').click(function (){
-        if ($('#select-type-delivery').text() === 'Доставка') {
-            $('#select-type-delivery').text('Самовывоз')
-            $('.address__title').text('Адрес самовывоза')
-            $('.info-about-shop').css('display', 'flex')
-            $('.info-about-shop').children('span').text('г. Киров, ул. Кооперации, д.2')
-            $('.address__change .address__radio').css('display', 'none')
-            $('.address__new').css('display', 'none')
-        } else {
-            $('#select-type-delivery').text('Доставка')
-            $('.address__title').text('Выберите адрес')
-            $('.info-about-shop').css('display', 'none')
-            $('.address__change .address__radio').css('display', 'flex')
+    select_type_delivery.addEventListener("click", function () {
+        if (document.getElementById("select-type-delivery").text === 'Доставка') {
+            document.getElementById("select-type-delivery").text = 'Самовывоз'
+            document.querySelector(".address__title").text = 'Адрес самовывоза'
+            document.querySelector(".info-about-shop").style.display = 'flex'
         }
     })
 

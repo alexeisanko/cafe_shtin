@@ -4,20 +4,15 @@ async function SendRequest(api_method, params, next_function, csrf, type_method 
     let url = new URL(api_method, document.location.origin);
     let body = null
     let headers = {}
-    switch (type_method) {
-        case "GET":
-            for (let [key, value] of Object.entries(params)) {
-                url.searchParams.set(key, value);
-            }
-            break
-        case "POST":
-            body = JSON.stringify(params)
-            headers['Content-Type'] = 'application/json'
-            headers['X-CSRFToken'] = csrf
-            break
+    if (type_method === 'GET' && params) {
+        for (let [key, value] of Object.entries(params)) {
+            url.searchParams.set(key, value);
+        }
+    } else if (type_method === 'POST') {
+        body = JSON.stringify(params)
+        headers['Content-Type'] = 'application/json'
+        headers['X-CSRFToken'] = csrf
     }
-    console.log(url)
-    console.log(body)
     let response = await fetch(
         url,
         {

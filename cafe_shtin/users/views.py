@@ -1,5 +1,6 @@
 from typing import Any, Dict
 import json
+import datetime
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -11,7 +12,6 @@ from django.conf import settings
 
 from cafe_shtin.users.api.serializers import LoginSerializer
 from cafe_shtin.sbis_presto.presto import CardUser, SbisUser, SbisPresto
-from cafe_shtin.utils.normalize_data import normalization_phone
 
 User = get_user_model()
 
@@ -28,45 +28,22 @@ profile_user_view = ProfileUserView.as_view()
 
 
 class UserLoginView(LoginView):
-
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         request_data = json.loads(request.body)
         serializer = LoginSerializer(data=request_data)
         if serializer.is_valid():
-            data = serializer.data
-            is_good_phone = normalization_phone(phone=data['phone'])
-            if is_good_phone['passed']:
-                data['phone'] = is_good_phone['phone']
-            else:
-                return JsonResponse({'error': is_good_phone['error']})
-            if data['method'] == 'get_code':
-                uniq_id = self._get_uniq_code(phone=data['phone'],
-                                              name=data['username'],
-                                              birthday=data['birthday'])
-                data['uniq_id'] = uniq_id
-                return JsonResponse(data)
-            if data['method'] == 'confirm_phone':
-                user, status = self._confirm_phone(phone=data['phone'],
-                                                   name=data['username'],
-                                                   birthday=data['birthday'],
-                                                   uniq_id=data['uniq_id'],
-                                                   code=data['code_user'])
-                if user:
-                    # user = authenticate(request, phone=user.phone, password=None)
-                    login(request, user)
-                    user.cashback = SbisPresto().get_balance_cashback(User.objects.get(id=user.id).uuid)
-                return JsonResponse(status)
-
+            data = serializer.validated_data
+            user, status = self._confirm_phone(phone=data['phone'],
+                                               name=data['username'],
+                                               birthday=data['birthday'],
+                                               uniq_id=data['uniq_id'],
+                                               code=data['code_user'])
+            if user:
+                # user = authenticate(request, phone=user.phone, password=None)
+                login(request, user)
+                user.cashback = SbisPresto().get_balance_cashback(user.uuid)
+            return JsonResponse(status)
         return JsonResponse(serializer.errors)
-
-    @staticmethod
-    def _get_uniq_code(phone, name, birthday):
-        if settings.CONNECT_SBIS:
-            user = CardUser(phone=phone, name=name, birthday=birthday)
-            uniq_id = user.verify_phone()
-        else:
-            uniq_id = 4321
-        return uniq_id
 
     @staticmethod
     def _confirm_phone(phone, name, birthday, uniq_id, code):

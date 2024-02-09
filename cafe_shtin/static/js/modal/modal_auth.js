@@ -30,37 +30,39 @@ window.addEventListener("load", function () {
 
     function SubmitForm() {
         let api_method = new URL(form_login.action).pathname
-        let data = {}
-        let csrf = null
-        for (let element of form_login.elements) {
-            if (element.name) {
-                if (element.name === 'csrfmiddlewaretoken') {
-                    csrf = element.value
-                } else {
-                    data[element.name] = element.value
-                }
-            }
-        }
-        // let data = new FormData(form_login);
+        let form_data = new FormData(form_login)
+        let csrf = form_data.get('csrfmiddlewaretoken')
+        let data_request = {}
         let next_function = null
         let type_method = "GET"
         switch (api_method) {
             case '/users/check_user/':
                 next_function = CheckUser
+                data_request = {
+                    phone: form_data.get('phone')
+                }
                 break
             case '/users/get_code/':
                 next_function = GetCode
-                data['method']  = 'get_code'
                 type_method = "POST"
+                data_request = {
+                    phone: form_data.get('phone')
+                }
                 break
             case "/users/confirm_login/":
                 next_function = ConfirmCode
-                data['method']  = 'confirm_phone'
                 type_method = "POST"
+                data_request = {
+                    phone: form_data.get('phone'),
+                    username: form_data.get('username'),
+                    birthday: form_data.get('birthday'),
+                    uniq_id: form_data.get('uniq_id'),
+                    code_user: form_data.get('code_user')
+                }
                 break
         }
         if (next_function) {
-            SendRequest(api_method, data, next_function, csrf, type_method)
+            SendRequest(api_method, data_request, next_function, csrf, type_method)
         } else {
             alert("Что-то пошло не так")
         }
@@ -69,13 +71,13 @@ window.addEventListener("load", function () {
     function CheckUser(data) {
         form_login.action = '/users/get_code/'
         if (data.is_user === false) {
-            $('.birthday-user').attr('type', 'date')
-            $('.name-user').attr('type', 'text')
+            document.querySelector(".birthday-user").setAttribute('type', 'date')
+            document.querySelector(".name-user").setAttribute('type', 'text')
             $('.form__title:first').text('Вы в первый раз?')
-            $('.extra_field').css('display', 'flex')
+            document.querySelector(".extra_field").style.display = 'flex'
         } else {
-            $('.birthday-user').val(data.birthday)
-            $('.name-user').val(data.username)
+            document.querySelector(".birthday-user").value = data.birthday
+            document.querySelector(".name-user").value = data.username
             SubmitForm()
         }
     }
@@ -83,10 +85,11 @@ window.addEventListener("load", function () {
     function GetCode(data) {
         form_login.action = '/users/confirm_login/'
         $('.form__title:first').text('Введите код SMS или последние 4 цифры звонка')
-        $('#reverse_timer').css('display', 'flex')
+        document.getElementById("reverse_timer").style.display = 'flex'
         startTimer(90, document.getElementById('reverse_timer'))
-        $('.code-user').attr('type', 'text')
-        $('.uniq-id').val(data.uniq_id)
+        document.querySelector(".code-user").setAttribute('type', 'text')
+        document.querySelector(".uniq-id").value = data.uniq_id
+
     }
 
     function ConfirmCode(data) {
