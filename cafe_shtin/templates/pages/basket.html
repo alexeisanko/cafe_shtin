@@ -38,10 +38,10 @@
             </div>
           </div>
           <div class="summary__info">
-{#            <div class="promo summary__item">#}
-{#              <input type="text" class="promo__title summary__title" placeholder="Промокод">#}
-{#              <span class="promo__num summary__num">Применить</span>#}
-{#            </div>#}
+            {#            <div class="promo summary__item">#}
+            {#              <input type="text" class="promo__title summary__title" placeholder="Промокод">#}
+            {#              <span class="promo__num summary__num">Применить</span>#}
+            {#            </div>#}
             <div class="ball summary__item">
               <span class="ball__title summary__title">Использовать баллы?</span>
               <label class="form-switch use-cashback">
@@ -54,12 +54,13 @@
           <div class="summary__cost">
             <p class="summary__text">Сумма заказа</p>
             <p class="summary__price without-cashback">{{ cart.get_total_price }} ₽</p>
-            <p class="summary__price with-cashback" style="display: none; color: #F8AB06">{{ cart.get_total_price_with_cashback }} ₽</p>
+            <p class="summary__price with-cashback"
+               style="display: none; color: #F8AB06">{{ cart.get_total_price_with_cashback }} ₽</p>
           </div>
           {% if not cart.get_total_price %}
             <div class="summary__btn">Перейти к оформлению</div>
           {% elif user.is_authenticated %}
-            <div class="summary__btn open-order modal_order">Перейти к оформлению</div>
+            <div class="summary__btn modal_order">Перейти к оформлению</div>
           {% else %}
             <div class="summary__btn modal_authentication" data-key="next_order">Перейти к оформлению</div>
           {% endif %}
@@ -100,7 +101,7 @@
             {% endfor %}
           {% endif %}
         </div>
-     </div>
+      </div>
     </div>
     {% if cart.cart_additions.items %}
       <div class="more">
@@ -176,12 +177,12 @@
               </div>
             </div>
             <div class="address__new check-new-address">
-              <input id="suggest-address" class="address__inp address__inp--big new_street_home" type="text"
+              <input id="new_suggest-address" class="address__inp address__inp--big new_street_home" type="text"
                      placeholder="Адрес">
               <div class="address__dop">
-                <input class="address__inp new_entrance" type="text" placeholder="Подъезд">
-                <input class="address__inp new_floor" type="text" placeholder="Этаж">
-                <input class="address__inp new_apartment" type="text" placeholder="Кв">
+                <input id="new_entrance" class="address__inp new_entrance" type="text" placeholder="Подъезд">
+                <input id="new_floor" class="address__inp new_floor" type="text" placeholder="Этаж">
+                <input id="new_apartment" class="address__inp new_apartment" type="text" placeholder="Кв">
               </div>
             </div>
           </div>
@@ -201,11 +202,6 @@
                 <label class="radio__label" for="cash">Наличными&nbsp;при&nbsp;получении</label>
               </div>
             </div>
-            {#                <div class="payment__info">#}
-            {#                    <input type="text" placeholder="Номер карты">#}
-            {#                    <input type="text" placeholder="Срок действия">#}
-            {#                    <input type="password" placeholder="CVC">#}
-            {#                </div>#}
             <div class="payment__balance">
               <span>Укажите сумму, с которой понадобится сдача </span>
               <input id="change" type="text" placeholder="1000">

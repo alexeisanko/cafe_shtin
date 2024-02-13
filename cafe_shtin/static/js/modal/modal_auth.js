@@ -73,7 +73,8 @@ window.addEventListener("load", function () {
         if (data.is_user === false) {
             document.querySelector(".birthday-user").setAttribute('type', 'date')
             document.querySelector(".name-user").setAttribute('type', 'text')
-            $('.form__title:first').text('Вы в первый раз?')
+            document.querySelector('.form__title').innerHTML = 'Вы в первый раз?'
+            // $('.form__title:first').text('Вы в первый раз?')
             document.querySelector(".extra_field").style.display = 'flex'
         } else {
             document.querySelector(".birthday-user").value = data.birthday
@@ -84,7 +85,8 @@ window.addEventListener("load", function () {
 
     function GetCode(data) {
         form_login.action = '/users/confirm_login/'
-        $('.form__title:first').text('Введите код SMS или последние 4 цифры звонка')
+        document.querySelector('.form__title').innerHTML = 'Введите код SMS или последние 4 цифры звонка'
+        // $('.form__title:first').text('Введите код SMS или последние 4 цифры звонка')
         document.getElementById("reverse_timer").style.display = 'flex'
         startTimer(90, document.getElementById('reverse_timer'))
         document.querySelector(".code-user").setAttribute('type', 'text')
