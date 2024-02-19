@@ -1,10 +1,10 @@
 window.addEventListener("load", function () {
 
     const modal_order = document.querySelector(".modal_order");
-    console.log(modal_order)
     const select_type_delivery = document.querySelector(".type-delivery input");
     const select_type_address = document.querySelectorAll(".address__change .address__radio input");
     const select_type_paymant = document.querySelectorAll(".payment__type .address__radio input");
+    const suggest_address = document.getElementById('new_suggest-address')
 
     modal_order.addEventListener("click", function () {
         MicroModal.show('modal_order');
@@ -53,6 +53,16 @@ window.addEventListener("load", function () {
                 document.querySelector(".payment__balance").style.display = 'flex'
             }
         })
+    });
+
+    suggest_address.addEventListener("change", function () {
+        setTimeout(() => {
+            SendRequest("/check_address/", {'address': this.value}, CheckAddress)
+            // анимация корректности адреса
+
+        }, 100);
+        // Проверка корректности адреса
+
     })
 
     if (sessionStorage.getItem('is_open_order') === 'True') {
@@ -60,3 +70,16 @@ window.addEventListener("load", function () {
         MicroModal.show('modal_order');
     }
 })
+
+
+function CheckAddress(data) {
+    if (data.status) {
+        document.getElementById('new_suggest-address').dataset['jsonAddress'] = JSON.stringify(data['data']['address_json'])
+        document.getElementById("bad_suggest_address").style.setProperty("display", "none")
+        document.getElementById("good_suggest_address").style.setProperty("display", "flex")
+    } else {
+        document.getElementById('new_suggest-address').dataset['jsonAddress'] = ""
+        document.getElementById("good_suggest_address").style.setProperty("display", "none")
+        document.getElementById("bad_suggest_address").style.setProperty("display", "flex")
+    }
+}

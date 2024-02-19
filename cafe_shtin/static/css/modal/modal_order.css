@@ -220,3 +220,86 @@
 
 
 
+
+hr.sep {
+  border: none;
+  height: 2px;
+  background-image: linear-gradient(to right, #f0f0f0, #f9e5be, #f0f0f0);
+}
+hr.sep::after {
+  content: '§';
+  display: inline-block;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(60deg);
+  transform-origin: 50% 50%;
+  padding: 1rem;
+  background-color: white;
+}
+
+
+
+/*CANCEL*/
+.cancel {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 0;
+}
+
+.cancel.circle {
+  animation: cancel-dash 2s ease-in;
+}
+
+.cancel.line {
+  stroke-dashoffset: 1000;
+  animation: cancel-dash 3s 0.35s ease-in forwards;
+}
+
+@keyframes cancel-dash {
+  0% {
+    stroke-dashoffset: 1000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes cancel-dash-check {
+  0% {
+    stroke-dashoffset: -100;
+  }
+  100% {
+    stroke-dashoffset: 900;
+  }
+}
+
+
+/*OK*/
+.ok {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 0;
+}
+
+.ok.circle {
+  animation: ok-dash 2s ease-in;
+}
+.ok.check {
+
+  stroke-dashoffset: -100;
+  animation: ok-dash-check 3.5s 0.05s ease-in forwards;
+}
+@keyframes ok-dash {
+  0% {
+    stroke-dashoffset: 1000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes ok-dash-check {
+  0% {
+    stroke-dashoffset: -100;
+  }
+  100% {
+    stroke-dashoffset: 900;
+  }
+}

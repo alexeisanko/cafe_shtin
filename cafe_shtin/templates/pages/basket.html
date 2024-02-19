@@ -6,10 +6,11 @@
   <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/modal/modal_order.css' %}">
   <link rel="stylesheet" href="{% static 'css/delivery/basket.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/@djthoms/pretty-checkbox"/>
 {% endblock css %}
 
 {% block javascript %}
-  <script src="https://api-maps.yandex.ru/2.1/?apikey=265fda5e-4f09-49c8-a141-205b2776d1fa&lang=ru_RU"
+  <script src="https://api-maps.yandex.ru/2.1.oldie.1/?apikey=265fda5e-4f09-49c8-a141-205b2776d1fa&lang=ru_RU"
           type="text/javascript">
   </script>
   <script src="{% static 'js/delivery/api-yandex.js' %}"></script>
@@ -17,6 +18,7 @@
   <script defer src="{% static 'js/carousel.js' %}"></script>
   <script src="{% static 'js/modal/modal_order.js' %}"></script>
   <script src="{% static 'js/delivery/basket.js' %}"></script>
+  <script src="{% static 'js/delivery/order.js' %}"></script>
 {% endblock javascript %}
 
 
@@ -153,53 +155,90 @@
         </header>
         <main class="modal__content" id="modal-1-content">
           <h3 class="title url__title">Оформление заказа</h3>
+
+
           <div class="url__change">
             <label class="form-switch type-delivery">
               <input id="checked-type-delivery" type="checkbox" name="isPickup" , value="Доставка">
               <i></i> <span id="select-type-delivery">Доставка</span>
             </label>
           </div>
+
+
+          <hr class="sep"/>
           <div class="address">
             <div class="address__change">
               <h3 class="address__title">Выберите адрес</h3>
               <div class="info-about-shop" style="display: none">
-                <br> <span></span>
+                <br> <span>Ул. Советская, д 166</span>
               </div>
-              {% for address in addresses %}
-                <div class="address__radio radio">
-                  <input id="address-{{ address.id }}" name="address" type="radio" value="{{ address.id }}">
-                  <label class="radio__label" for="address-{{ address.id }}">{{ address.address }}</label>
+
+              <!-- цикл в джанго с адресами -->
+              <div class="address__radio radio pretty p-default p-round p-smooth" style="display: flex">
+                <input id="address_1" name="address" type="radio" value=1>
+                <div class="state p-warning">
+                  <label class="radio__label" for="address_1">Советская 166, кв. 47</label>
                 </div>
-              {% endfor %}
-              <div class="address__radio radio">
-                <input id="address-new" name="address" type="radio" value="new-address">
-                <label class="radio__label" for="address-new">Выбрать новый адрес</label>
               </div>
-            </div>
-            <div class="address__new check-new-address">
-              <input id="new_suggest-address" class="address__inp address__inp--big new_street_home" type="text"
-                     placeholder="Адрес">
-              <div class="address__dop">
-                <input id="new_entrance" class="address__inp new_entrance" type="text" placeholder="Подъезд">
-                <input id="new_floor" class="address__inp new_floor" type="text" placeholder="Этаж">
-                <input id="new_apartment" class="address__inp new_apartment" type="text" placeholder="Кв">
+              <!-- конец цикла -->
+
+
+              <div class="address__radio radio pretty p-default p-round p-smooth">
+                <input id="address-new" name="address" type="radio" value="new-address">
+                <div class="state p-warning">
+                  <label class="radio__label" for="address-new">Выбрать новый адрес</label>
+                </div>
+              </div>
+
+              <div class="address__new check-new-address">
+                <div class="address__dop">
+                  <input id="new_suggest-address" class="address__inp address__inp--big new_street_home" type="text" data-json-address =""
+                         placeholder="Адрес">
+                  <!-- CANCEL -->
+                  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="bad_suggest_address" style="display: none" x="0px" y="0px" viewBox="0 0 45 45" enable-background="new 0 0 32 32" xml:space="preserve" width="30px" height="30px">
+                  <circle class="cancel circle" fill="none" stroke="#dc3545" stroke-width="1" stroke-miterlimit="10" cx="16" cy="16" r="12"/>
+                  <line class="cancel line" fill="none" stroke="#dc3545" stroke-width="1" stroke-miterlimit="10" x1="11.5" y1="11.5" x2="20.5" y2="20.5"/>
+                  <line class="cancel line" fill="none" stroke="#dc3545" stroke-width="1" stroke-miterlimit="10" x1="20.5" y1="11.5" x2="11.5" y2="20.5"/>
+                  </svg>
+                  <!-- OK -->
+                  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="good_suggest_address" style="display: none" x="0px" y="0px" viewBox="0 0 45 45" enable-background="new 0 0 32 32" xml:space="preserve" width="30px" height="30px">
+                  <circle class="ok circle" fill="none" stroke="#28a745" stroke-width="1" stroke-miterlimit="10" cx="16" cy="16" r="12"/>
+                  <polyline class="ok check" fill="none" stroke="#28a745" stroke-width="1" stroke-miterlimit="10" points="23,12 15,20 10,15 "/>
+                  </svg>
+                </div>
+
+                <div class="address__dop" style="margin-bottom: 15px">
+                  <input id="new_entrance" class="address__inp new_entrance" type="text" placeholder="Подъезд">
+                  <input id="new_floor" class="address__inp new_floor" type="text" placeholder="Этаж">
+                  <input id="new_apartment" class="address__inp new_apartment" type="text" placeholder="Кв">
+                </div>
               </div>
             </div>
           </div>
+          <hr class="sep"/>
           <div class="payment" style="display: inline-block">
-            <div class="payment__type">
+            <div class="payment__type" style="display: grid">
               <h3 class="payment__title">Выберите тип оплаты</h3>
-              <div class="address__radio radio">
+
+              <div class="address__radio radio pretty p-default p-curve p-smooth">
                 <input id="online" name="payment" type="radio" value="online">
-                <label class="radio__label" for="online">Онлайн оплата</label>
+                <div class="state p-warning">
+                  <label class="radio__label" for="online">Онлайн оплата</label>
+                </div>
               </div>
-              <div class="address__radio radio">
+
+              <div class="address__radio radio pretty p-default p-curve p-smooth">
                 <input id="cart" name="payment" type="radio" value="cart">
-                <label class="radio__label" for="cart">Картой при получении</label>
+                <div class="state p-warning">
+                  <label class="radio__label" for="cart">Картой при получении</label>
+                </div>
               </div>
-              <div class="address__radio radio">
+
+              <div class="address__radio radio pretty p-default p-curve p-smooth">
                 <input id="cash" name="payment" type="radio" value="cash">
-                <label class="radio__label" for="cash">Наличными&nbsp;при&nbsp;получении</label>
+                <div class="state p-warning">
+                  <label class="radio__label" for="cash">Наличными&nbsp;при&nbsp;получении</label>
+                </div>
               </div>
             </div>
             <div class="payment__balance">
@@ -207,6 +246,7 @@
               <input id="change" type="text" placeholder="1000">
             </div>
           </div>
+          {% csrf_token %}
           <div class="modal__btn" id="make-order" url="">оформить заказ</div>
         </main>
         <footer></footer>

@@ -240,7 +240,7 @@ class SbisOrder:
             'enteredAddress': address
         }
         response = requests.get(url, params=parameters, headers=cls.headers).json()
-        address_full, address_json = response['addresses'][0]['addressFull'], response['addresses'][0]['addressJSON']
+        address_full, address_json = response['addresses'][0]['addressFull'], json.loads(response['addresses'][0]['addressJSON'])
         if address_json['HouseNum']:
             return {'status': True, 'address_full': address_full, 'address_json': address_json, 'error': None}
         else:
@@ -249,10 +249,10 @@ class SbisOrder:
 
     @classmethod
     def _check_delivery_zone(cls, address):
-        url = f'hhttps://api.sbis.ru/retail/delivery/cost'
+        url = f'https://api.sbis.ru/retail/delivery/cost'
         parameters = {
             'pointId': settings.SHOP_ID,
-            'address': address
+            'address': json.dumps(address, ensure_ascii=False)
         }
         response = requests.get(url, params=parameters, headers=cls.headers).json()
         if response['district']:

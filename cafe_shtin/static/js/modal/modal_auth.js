@@ -1,5 +1,5 @@
 window.addEventListener("load", function () {
-    const modal_auth = document.querySelector(".modal_authentication");
+    const modal_auth = document.querySelectorAll(".modal_authentication");
     const form_login = document.getElementById("form_login");
     const phone = document.getElementById('phone-user');
     const maskOptions = {
@@ -7,15 +7,16 @@ window.addEventListener("load", function () {
     };
     const mask = IMask(phone, maskOptions);
 
-    modal_auth.addEventListener("click", function () {
-        let key = this.dataset.key
-        if (key === 'next_order') {
-            sessionStorage.setItem('is_open_order', "True")
-        } else {
-            sessionStorage.setItem('is_open_order', "False")
-        }
-        MicroModal.show('modal_authentication');
-
+    modal_auth.forEach(function (item) {
+        item.addEventListener("click", function () {
+            let key = this.dataset.key
+            if (key === 'next_order') {
+                sessionStorage.setItem('is_open_order', "True")
+            } else {
+                sessionStorage.setItem('is_open_order', "False")
+            }
+            MicroModal.show('modal_authentication');
+        })
     });
 
     form_login.addEventListener("submit", function (event) {

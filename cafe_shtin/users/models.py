@@ -58,4 +58,8 @@ class User(AbstractUser):
 
 class AddressUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    address = models.TextField(verbose_name='Адрес доставки')
+    full_address = models.TextField(verbose_name='Адрес доставки')
+    json_address = models.TextField(verbose_name='JSON адрес')
+    entrance = models.CharField(verbose_name='Подъезд', max_length=50, null=True, blank=True)
+    floor = models.CharField(verbose_name='Этаж', max_length=50, null=True, blank=True)
+    apartment = models.CharField(verbose_name='Квартира', max_length=50, null=True, blank=True)
