@@ -5,6 +5,7 @@ from django.http import HttpRequest, JsonResponse
 
 from cafe_shtin.utils.catalog_shop import get_actual_menu, is_open
 from cafe_shtin.delivery.models import Product, Addition
+from cafe_shtin.users.models import AddressUser
 from cafe_shtin.delivery.cart import Cart
 
 
@@ -24,6 +25,12 @@ home_view = HomeView.as_view()
 
 class BasketView(TemplateView):
     template_name = 'pages/basket.html'
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        user_address = AddressUser.objects.filter(user=self.request.user)
+        context['addresses'] = user_address
+        return context
 
 
 basket_view = BasketView.as_view()

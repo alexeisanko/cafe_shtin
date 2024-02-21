@@ -172,17 +172,14 @@
               <div class="info-about-shop" style="display: none">
                 <br> <span>Ул. Советская, д 166</span>
               </div>
-
-              <!-- цикл в джанго с адресами -->
-              <div class="address__radio radio pretty p-default p-round p-smooth" style="display: flex">
-                <input id="address_1" name="address" type="radio" value=1>
+              {% for address in addresses %}
+                <div class="address__radio radio pretty p-default p-round p-smooth" style="display: flex">
+                <input id="address_1" name="address" type="radio" value={{ address.json_address }}>
                 <div class="state p-warning">
-                  <label class="radio__label" for="address_1">Советская 166, кв. 47</label>
+                  <label class="radio__label" for="address_1">{{ address.pretty_address }}</label>
                 </div>
               </div>
-              <!-- конец цикла -->
-
-
+              {% endfor %}
               <div class="address__radio radio pretty p-default p-round p-smooth">
                 <input id="address-new" name="address" type="radio" value="new-address">
                 <div class="state p-warning">

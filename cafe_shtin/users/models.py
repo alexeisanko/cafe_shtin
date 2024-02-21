@@ -63,3 +63,6 @@ class AddressUser(models.Model):
     entrance = models.CharField(verbose_name='Подъезд', max_length=50, null=True, blank=True)
     floor = models.CharField(verbose_name='Этаж', max_length=50, null=True, blank=True)
     apartment = models.CharField(verbose_name='Квартира', max_length=50, null=True, blank=True)
+
+    def pretty_address(self):
+        return self.full_address

@@ -23,13 +23,13 @@ def get_actual_menu(min_balance=0) -> dict:
 
 def is_breakfast_time() -> bool:
     time_now = datetime.now()
-    if 6 < time_now.hour < 12:
+    if 6 <= time_now.hour < 12:
         return True
     return False
 
 
 def is_open() -> bool:
     time_now = datetime.now()
-    if 6 < time_now.hour < 24:
+    if 6 <= time_now.hour < 24:
         return True
     return False
