@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/modal/modal_order.css' %}">
   <link rel="stylesheet" href="{% static 'css/delivery/basket.css' %}">
-    <link rel="stylesheet" href="https://unpkg.com/@djthoms/pretty-checkbox"/>
+  <link rel="stylesheet" href="https://unpkg.com/@djthoms/pretty-checkbox"/>
 {% endblock css %}
 
 {% block javascript %}
@@ -74,7 +74,7 @@
           {% else %}
             {% for product_id, product in cart.cart.items %}
               <div class="order__item item" id="product_{{ product_id }}">
-                <div class="item__del">
+                <div class="item__del" data-product_id="{{ product_id }}">
                   <img src="{% static 'images/products/close.svg' %}" alt="Х">
                 </div>
                 <div class="order__info">
@@ -92,9 +92,11 @@
                     <div class="item__count">
                       <p class="item__endcost">{{ product.total }} ₽</p>
                       <div class="count">
-                        <span class="count__minus"><img src="{% static 'images/products/minus.svg' %}" alt="-"></span>
+                        <span class="count__minus" data-product_id="{{ product_id }}" data-quantity="-1"><img
+                          src="{% static 'images/products/minus.svg' %}" alt="-"></span>
                         <span class="count__text">{{ product.quantity }} шт</span>
-                        <span class="count__plus"><img src="{% static 'images/products/plus.svg' %}" alt="+"></span>
+                        <span class="count__plus" data-product_id="{{ product_id }}" data-quantity="1"><img
+                          src="{% static 'images/products/plus.svg' %}" alt="+"></span>
                       </div>
                     </div>
                   </div>
@@ -117,20 +119,22 @@
       <p class="more__subtitle">{{ addition.name }}</p>
       <p class="more__price">{{ addition.price }} ₽</p>
       {% if addition.quantity == 0 %}
-        <div class="more__btn">Добавить в корзину</div>
+        <div class="more__btn" data-addition_id="{{ addition_id }}" data-quantity="1">Добавить в корзину</div>
         <div class="count more__count">
-        <span class="addition_minus count__minus"><img
+        <span class="addition_minus count__minus" data-addition_id="{{ addition_id }}" data-quantity="-1"><img
           src="{% static 'images/products/minus.svg' %}" alt="-"></span>
           <span class="count__text">1 шт</span>
-          <span class="addition_plus count__plus"><img
+          <span class="addition_plus count__plus" data-addition_id="{{ addition_id }}" data-quantity="1"><img
             src="{% static 'images/products/plus.svg' %}" alt="+"></span>
         </div>
       {% else %}
-        <div class="more__btn" style="display:none">Добавить в корзину</div>
+        <div class="more__btn" style="display:none" data-addition_id="{{ addition_id }}" data-quantity="1">Добавить в корзину</div>
         <div class="count more__count" style="display:flex">
-          <span class="addition_minus count__minus"><img src="{% static 'images/products/minus.svg' %}" alt="-"></span>
+          <span class="addition_minus count__minus" data-addition_id="{{ addition_id }}" data-quantity="-1"><img
+            src="{% static 'images/products/minus.svg' %}" alt="-"></span>
           <span class="count__text">{{ addition.quantity }} шт</span>
-          <span class="addition_plus count__plus"><img src="{% static 'images/products/plus.svg' %}" alt="+"></span>
+          <span class="addition_plus count__plus" data-addition_id="{{ addition_id }}" data-quantity="1"><img
+            src="{% static 'images/products/plus.svg' %}" alt="+"></span>
         </div>
       {% endif %}
     </div>
@@ -174,11 +178,11 @@
               </div>
               {% for address in addresses %}
                 <div class="address__radio radio pretty p-default p-round p-smooth" style="display: flex">
-                <input id="address_1" name="address" type="radio" value={{ address.json_address }}>
-                <div class="state p-warning">
-                  <label class="radio__label" for="address_1">{{ address.pretty_address }}</label>
+                  <input id="address_1" name="address" type="radio" value={{ address.json_address }}>
+                  <div class="state p-warning">
+                    <label class="radio__label" for="address_1">{{ address.pretty_address }}</label>
+                  </div>
                 </div>
-              </div>
               {% endfor %}
               <div class="address__radio radio pretty p-default p-round p-smooth">
                 <input id="address-new" name="address" type="radio" value="new-address">
@@ -189,18 +193,28 @@
 
               <div class="address__new check-new-address">
                 <div class="address__dop">
-                  <input id="new_suggest-address" class="address__inp address__inp--big new_street_home" type="text" data-json-address =""
+                  <input id="new_suggest-address" class="address__inp address__inp--big new_street_home" type="text"
+                         data-json-address=""
                          placeholder="Адрес">
                   <!-- CANCEL -->
-                  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="bad_suggest_address" style="display: none" x="0px" y="0px" viewBox="0 0 45 45" enable-background="new 0 0 32 32" xml:space="preserve" width="30px" height="30px">
-                  <circle class="cancel circle" fill="none" stroke="#dc3545" stroke-width="1" stroke-miterlimit="10" cx="16" cy="16" r="12"/>
-                  <line class="cancel line" fill="none" stroke="#dc3545" stroke-width="1" stroke-miterlimit="10" x1="11.5" y1="11.5" x2="20.5" y2="20.5"/>
-                  <line class="cancel line" fill="none" stroke="#dc3545" stroke-width="1" stroke-miterlimit="10" x1="20.5" y1="11.5" x2="11.5" y2="20.5"/>
+                  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
+                       id="bad_suggest_address" style="display: none" x="0px" y="0px" viewBox="0 0 45 45"
+                       enable-background="new 0 0 32 32" xml:space="preserve" width="30px" height="30px">
+                  <circle class="cancel circle" fill="none" stroke="#dc3545" stroke-width="1" stroke-miterlimit="10"
+                          cx="16" cy="16" r="12"/>
+                    <line class="cancel line" fill="none" stroke="#dc3545" stroke-width="1" stroke-miterlimit="10"
+                          x1="11.5" y1="11.5" x2="20.5" y2="20.5"/>
+                    <line class="cancel line" fill="none" stroke="#dc3545" stroke-width="1" stroke-miterlimit="10"
+                          x1="20.5" y1="11.5" x2="11.5" y2="20.5"/>
                   </svg>
                   <!-- OK -->
-                  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="good_suggest_address" style="display: none" x="0px" y="0px" viewBox="0 0 45 45" enable-background="new 0 0 32 32" xml:space="preserve" width="30px" height="30px">
-                  <circle class="ok circle" fill="none" stroke="#28a745" stroke-width="1" stroke-miterlimit="10" cx="16" cy="16" r="12"/>
-                  <polyline class="ok check" fill="none" stroke="#28a745" stroke-width="1" stroke-miterlimit="10" points="23,12 15,20 10,15 "/>
+                  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
+                       id="good_suggest_address" style="display: none" x="0px" y="0px" viewBox="0 0 45 45"
+                       enable-background="new 0 0 32 32" xml:space="preserve" width="30px" height="30px">
+                  <circle class="ok circle" fill="none" stroke="#28a745" stroke-width="1" stroke-miterlimit="10" cx="16"
+                          cy="16" r="12"/>
+                    <polyline class="ok check" fill="none" stroke="#28a745" stroke-width="1" stroke-miterlimit="10"
+                              points="23,12 15,20 10,15 "/>
                   </svg>
                 </div>
 

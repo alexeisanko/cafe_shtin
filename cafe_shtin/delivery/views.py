@@ -28,8 +28,9 @@ class BasketView(TemplateView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        user_address = AddressUser.objects.filter(user=self.request.user)
-        context['addresses'] = user_address
+        if self.request.user.is_authenticated:
+            user_address = AddressUser.objects.filter(user=self.request.user)
+            context['addresses'] = user_address
         return context
 
 
@@ -53,6 +54,7 @@ class ChangeBasket(DetailView):
         cart.change(product=product, quantity=quantity)
         if cart.cart.get(product_id, False):
             data = {
+                'product_id': product_id,
                 'quantity': cart.cart[product_id]['quantity'],
                 'total_price_product': cart.cart[product_id]['total'],
                 'total_count_product': cart.get_total_count_products(),
@@ -62,6 +64,7 @@ class ChangeBasket(DetailView):
             }
         else:
             data = {
+                'product_id': product_id,
                 'quantity': 0,
                 'total_price_product': 0,
                 'total_count_product': cart.get_total_count_products(),
@@ -83,6 +86,7 @@ class ChangeBasketAdditions(DetailView):
         cart.change_addition(addition=addition, quantity=quantity)
         if cart.cart_additions.get(addition_id, False):
             data = {
+                'addition_id': addition_id,
                 'quantity': cart.cart_additions[addition_id]['quantity'],
                 'total_price_product': cart.cart_additions[addition_id]['total'],
                 'total_count_product': cart.get_total_count_products(),
@@ -91,8 +95,9 @@ class ChangeBasketAdditions(DetailView):
             }
         else:
             data = {
-                'quantity': cart.cart_additions[addition_id]['quantity'],
-                'total_price_product': cart.cart_additions[addition_id]['total'],
+                'addition_id': addition_id,
+                'quantity': 0,
+                'total_price_product': 0,
                 'total_count_product': cart.get_total_count_products(),
                 'total_price_order': cart.get_total_price(),
                 'total_cashback': cart.get_received_cashback()

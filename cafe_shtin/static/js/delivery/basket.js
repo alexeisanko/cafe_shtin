@@ -1,140 +1,91 @@
-$(document).ready(function () {
+window.addEventListener("load", function () {
+    const change_balance_product = document.querySelectorAll('.count__plus, .count__minus, .more__btn')
+    const delete_product = document.querySelectorAll('.item__del')
+    const use_cashback = document.querySelector(".use-cashback i");
 
-    // Change product in basket
-    $('.item__count .balance .count__plus').click(function () {
-        let $product = $(this).parent('div').parent('div').parent('div').parent('div').parent('div')
-        UpdateBasketProduct($product, quantity = 1)
-    });
+    change_balance_product.forEach(function (item) {
+        item.addEventListener("click", function () {
+            let quantity = this.dataset.quantity
+            let product = this.dataset.product_id
+            let addition = this.dataset.addition_id
+            if (product !== 'undefined') {
+                SendRequest("/change_basket/", {'product_id': product, 'quantity': quantity}, UpdateProductHTML)
+            } else if (addition !== 'undefined') {
+                SendRequest("/change_additions_in_basket/", {
+                    'addition_id': addition,
+                    'quantity': quantity
+                }, UpdateAdditionHTML)
+            }
 
-    $('.item__count .balance .count__minus').click(function () {
-        let $product = $(this).parent('div').parent('div').parent('div').parent('div').parent('div')
-        UpdateBasketProduct($product, quantity = -1)
-    });
+        })
+    })
 
-    $('.item__del').click(function () {
-        let $product = $(this).parent('div')
-        let text = $product.children('.order__info').children('.order__cost').children('.item__count').children('.balance').children('.count__text').text()
-        let quantity = parseInt(text.match(/\d+/))
-        UpdateBasketProduct($product, quantity = -quantity)
-    });
+    delete_product.forEach(function (item) {
+        item.addEventListener("click", function () {
+            const product_id = this.dataset.product_id
+            const product = document.getElementById(`product_${product_id}`)
+            const text = product.children[1].children[1].children[1].children[1].children[1].textContent
+            const quantity = parseInt(text.match(/\d+/))
+            console.log(quantity)
+            SendRequest("/change_basket/", {'product_id': product_id, 'quantity': -quantity}, UpdateProductHTML)
+        })
+    })
 
-    function UpdateProductMedia($product, data) {
-        $product.children('.order__info').children('.order__cost').children('.item__count').children('.balance').children('.count__text').text(`${data.quantity} шт`)
-        $product.children('.order__info').children('.order__cost').children('.item__count').children('.item__endcost').text(`${data.total_price_product} ₽`)
+    use_cashback.addEventListener("click", function () {
+
+        if (document.querySelector('.use-cashback').classList.contains('active')) {
+            document.querySelector('.use-cashback').classList.remove('active')
+            document.querySelector('.without-cashback').style.display = 'flex'
+            document.querySelector('.with-cashback').style.display = 'none'
+        } else {
+            document.querySelector('.use-cashback').classList.add('active')
+            document.querySelector('.without-cashback').style.display = 'none'
+            document.querySelector('.with-cashback').style.display = 'flex'
+        }
+    })
+
+    function UpdateProductMedia(data) {
+        const product = document.getElementById(`product_${data.product_id}`)
+        product.children[1].children[1].children[1].children[0].innerHTML = `${data.total_price_product} ₽`
+        product.children[1].children[1].children[1].children[1].children[1].innerHTML = `${data.quantity} шт`
         if (data.quantity == 0) {
-            $product.css('display', 'none');
+            product.style.display = 'none';
         }
     }
 
     function UpdateBasketMedia(data) {
         if (data.total_count_product === 0) {
-            $('.basket__media').css('display', 'none')
+            document.querySelector('.basket__media').style.display = 'none';
         } else {
-            $('.basket__media').css('display', 'flex')
+            document.querySelector('.basket__media').style.display = 'flex';
         }
-        $('.basket__price').text(`${data.total_price_order} ₽`);
-        $('.without-cashback').text(data.total_price_order)
-        $('.with-cashback').text(data.total_price_with_cashback)
-        $('.basket__media').text(data.total_count_product)
-        $('.cashback__num').text(data.total_cashback)
+        document.querySelector('.basket__price').innerHTML = `${data.total_price_order} ₽`
+        document.querySelector('.without-cashback').innerHTML = data.total_price_order
+        document.querySelector('.with-cashback').innerHTML = data.total_price_with_cashback
+        document.querySelector('.basket__media').innerHTML = data.total_count_product
+        document.querySelector('.cashback__num').innerHTML = data.total_cashback
     }
 
-    function UpdateProductHTML($product, data) {
-        UpdateProductMedia($product, data)
+    function UpdateProductHTML(data) {
+        UpdateProductMedia(data)
         UpdateBasketMedia(data)
     }
 
-    function GetProductURL(product_id, quantity) {
-        let url = new URL('change_basket', document.location.origin);
-        url.searchParams.set('product_id', product_id)
-        url.searchParams.set('quantity', quantity)
-        return url
-    }
-
-    function UpdateBasketProduct($product, quantity) {
-        let product_id = Number($product.attr('id').slice($product.attr('id').indexOf('_') + 1))
-        let url = GetProductURL(product_id, quantity)
-        $.ajax({
-            type: 'GET',
-            url: url,
-            success: function (data) {
-                UpdateProductHTML($product, data)
-            },
-            error: function (data) {
-                alert('Не удалось изменить продукт')
-            }
-        });
-    }
-
-
-    // Change additions in product
-    $('.more__btn').click(function () {
-        let $addition = $(this).parent('div')
-        UpdateBasketAddition($addition, 1)
-
-    })
-
-    $('.addition_plus').click(function () {
-        let $addition = $(this).parent('div').parent('div')
-        UpdateBasketAddition($addition, 1)
-
-    })
-
-    $('.addition_minus').click(function () {
-        let $addition = $(this).parent('div').parent('div')
-        UpdateBasketAddition($addition, -1)
-    })
-
-    function UpdateAdditionMedia($addition, data) {
+    function UpdateAdditionMedia(data) {
+        const addition = document.getElementById(`addition_${data.addition_id}`)
         if (data.quantity === 0) {
-            $addition.children('.more__btn').css('display', 'flex');
-            $addition.children('.balance').css('display', 'none');
+            addition.children[3].style.display = 'flex';
+            addition.children[4].style.display = 'none';
         } else {
-            $addition.children('.more__btn').css('display', 'none');
-            $addition.children('.balance').css('display', 'flex');
-            $addition.children('.balance').children('.count__text').text(`${data.quantity} шт`)
+            addition.children[3].style.display = 'none';
+            addition.children[4].style.display = 'flex';
+            addition.children[4].children[1].innerHTML = `${data.quantity} шт`
         }
     }
 
-    function UpdateAdditionHTML($addition, data) {
-        UpdateAdditionMedia($addition, data)
+    function UpdateAdditionHTML(data) {
+        UpdateAdditionMedia(data)
         UpdateBasketMedia(data)
     }
-
-    function GetAdditionURL(addition_id, quantity) {
-        let url = new URL('change_additions_in_basket', document.location.origin);
-        url.searchParams.set('addition_id', addition_id)
-        url.searchParams.set('quantity', quantity)
-        return url
-    }
-
-    function UpdateBasketAddition($addition, quantity) {
-        let addition_id = Number($addition.attr('id').slice($addition.attr('id').indexOf('_') + 1))
-        let url = GetAdditionURL(addition_id, quantity)
-        $.ajax({
-            type: 'GET',
-            url: url,
-            success: function (data) {
-                UpdateAdditionHTML($addition, data)
-            },
-            error: function (data) {
-                alert('Не удалось изменить продукт')
-            }
-        });
-    }
-
-    $('.use-cashback i').click(function () {
-        if ($('.use-cashback').hasClass('active')) {
-            $('.use-cashback').removeClass('active')
-            $('.without-cashback').css('display', 'flex')
-            $('.with-cashback').css('display', 'none')
-        } else {
-            $('.use-cashback').addClass('active')
-            $('.without-cashback').css('display', 'none')
-            $('.with-cashback').css('display', 'flex')
-
-        }
-
-    })
 
 })

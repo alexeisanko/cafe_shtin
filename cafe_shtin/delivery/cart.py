@@ -32,6 +32,7 @@ class Cart:
                                          'image': product.image.url,
                                          'name': product.name,
                                          'weight': product.weight,
+                                         'description': product.description,
                                          'total': quantity * product.price,
                                          }
             self.cart[product_id]['quantity'] += quantity

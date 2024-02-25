@@ -1,6 +1,6 @@
 /* Project specific Javascript goes here. */
 
-async function SendRequest(api_method, params, next_function, csrf, type_method = 'GET',  ) {
+async function SendRequest(api_method, params, next_function, csrf=null, type_method = 'GET',  ) {
     let url = new URL(api_method, document.location.origin);
     let body = null
     let headers = {}
