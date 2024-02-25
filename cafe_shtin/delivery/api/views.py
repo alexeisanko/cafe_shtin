@@ -44,13 +44,17 @@ class CreateOrder(APIView):
         serializer = CheckRequestCreateOrderSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
+            if data['type_delivery'] == 'pickup':
+                address = None
             # Получение адреса
-            if data['address']['is_new']:
+            elif data['address'].get('is_new', False):
+                # Если новый адрес
                 new_address = AddressSerializer(data={'full_address': data['address']['new_address']['full_address'],
                                                 'json_address': data['address']['new_address']['json_address'],
                                                 'entrance': data['address']['new_address']['entrance'],
                                                 'floor': data['address']['new_address']['floor'],
-                                                'apartment': data['address']['new_address']['apartment']})
+                                                'apartment': data['address']['new_address']['apartment'],
+                                                'user': request.user.id})
                 if new_address.is_valid():
                     new_address.save()
                 else:

@@ -12,11 +12,11 @@ class ProductSerializer(serializers.ModelSerializer):
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = AddressUser
-        fields = ['full_address', 'json_address', 'entrance', 'floor', 'apartment']
+        fields = ['user', 'full_address', 'json_address', 'entrance', 'floor', 'apartment']
 
 
 class CheckRequestCreateOrderSerializer(serializers.Serializer):
-    type_payment = serializers.ChoiceField(required=True, choices=[('online', 'online'), ('cash', 'cash'), ('card', 'card')])
+    type_payment = serializers.ChoiceField(required=True, choices=[('online', 'online'), ('cash', 'cash'), ('cart', 'cart')])
     type_delivery = serializers.ChoiceField(required=True, choices=[('delivery', 'delivery'), ('pickup', 'pickup')])
     use_cashback = serializers.BooleanField(required=True)
     address = serializers.JSONField(required=True)

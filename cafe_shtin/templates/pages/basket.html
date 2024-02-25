@@ -178,9 +178,9 @@
               </div>
               {% for address in addresses %}
                 <div class="address__radio radio pretty p-default p-round p-smooth" style="display: flex">
-                  <input id="address_1" name="address" type="radio" value={{ address.json_address }}>
+                  <input id="address_{{ address.id }}" name="address" type="radio" value={{ address.id }}>
                   <div class="state p-warning">
-                    <label class="radio__label" for="address_1">{{ address.pretty_address }}</label>
+                    <label class="radio__label" for="address_{{ address.id }}">{{ address.pretty_address }}</label>
                   </div>
                 </div>
               {% endfor %}
