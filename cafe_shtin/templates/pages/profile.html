@@ -42,7 +42,7 @@
                 <p class="data__title">Адрес</p>
                 {% for address in addresses %}
                 <div class="address__item">
-                    <span class="address__text">{{ address.address}}</span>
+                    <span class="address__text">{{ address.pretty_address}}</span>
                     <div class="address__btns"><img src="{% static 'images/profile/change.svg' %}" alt="изменить" class="address__change"><img src="{% static 'images/profile/account-basket.svg' %}" alt="удалить" class="address__del"></div>
                 </div>
                 {% endfor %}

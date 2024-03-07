@@ -11,7 +11,9 @@ from django.http import HttpRequest, JsonResponse
 from django.conf import settings
 
 from cafe_shtin.users.api.serializers import LoginSerializer
+from cafe_shtin.users.models import AddressUser
 from cafe_shtin.sbis_presto.presto import CardUser, SbisUser, SbisPresto
+from cafe_shtin.delivery.models import Orders
 
 User = get_user_model()
 
@@ -21,6 +23,9 @@ class ProfileUserView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context['addresses'] = AddressUser.objects.filter(user=self.request.user)
+        context['orderes'] = Orders.objects.filter(user=self.request.user)
+        context['cashback'] = SbisPresto().get_balance_cashback(self.request.user.uuid)
         return context
 
 
